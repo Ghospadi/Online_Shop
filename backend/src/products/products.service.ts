@@ -1,10 +1,10 @@
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { HttpCode, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { CreateProductsDto } from 'src/generated/nestjs-dto/create-products.dto';
 import { UpdateProductsDto } from 'src/generated/nestjs-dto/update-products.dto';
-import { NotFoundException } from '@nestjs/common/exceptions';
-import { CATEGORY_NOT_FOUND } from 'consts';
+import { CreateProductsDto } from 'src/generated/nestjs-dto/create-products.dto';
+import { PRODUCT_NOT_FOUND } from 'consts';
 
 @Injectable()
 export class ProductsService {
@@ -36,31 +36,23 @@ export class ProductsService {
     };
   }
 
-  async findProduct(id: Prisma.productsWhereUniqueInput) {
-    return this.prisma.products.findFirst({
-      where: id,
+  async findProduct(products: Prisma.productsWhereUniqueInput) {
+    return this.prisma.products.findUnique({
+      where: products,
     });
   }
 
-  async createProduct(dto: CreateProductsDto) {
-    const category = await this.prisma.categories.findFirst({
-      where: { id: dto.category_id },
-    });
-
-    if (!category) {
-      throw new NotFoundException(CATEGORY_NOT_FOUND);
-    }
-
+  async createProduct(data: CreateProductsDto) {
     return this.prisma.products.create({
       data: {
-        name: dto.name,
-        description: dto.description,
-        price: dto.price,
-        image: dto.image,
-        stock: dto.stock,
+        name: data.name,
+        description: data.description,
+        image: data.image,
+        price: data.price,
+        stock: data.stock,
         categories: {
           connect: {
-            id: dto.category_id,
+            id: data.category_id,
           },
         },
       },
@@ -69,26 +61,26 @@ export class ProductsService {
 
   async updateProduct(params: {
     where: Prisma.productsWhereUniqueInput;
-    dto: UpdateProductsDto;
+    data: UpdateProductsDto;
   }) {
-    const { where, dto } = params;
-    const category = await this.prisma.categories.findFirst({
-      where: { id: dto.category_id },
-    });
+    const { where, data } = params;
 
-    if (!category) {
-      throw new NotFoundException(CATEGORY_NOT_FOUND);
+    const product = await this.findProduct(where);
+
+    if (!product) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND);
     }
+
     return this.prisma.products.update({
       data: {
-        name: dto.name,
-        description: dto.description,
-        price: dto.price,
-        image: dto.image,
-        stock: dto.stock,
+        name: data.name,
+        description: data.description,
+        image: data.image,
+        price: data.price,
+        stock: data.stock,
         categories: {
           connect: {
-            id: dto.category_id,
+            id: data.category_id,
           },
         },
       },
@@ -97,9 +89,15 @@ export class ProductsService {
   }
 
   @HttpCode(200)
-  async deleteProduct(id: Prisma.productsWhereUniqueInput) {
+  async deleteProduct(where: Prisma.productsWhereUniqueInput) {
+    const product = await this.findProduct(where);
+
+    if (!product) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND);
+    }
+
     await this.prisma.products.delete({
-      where: id,
+      where,
     });
   }
 }

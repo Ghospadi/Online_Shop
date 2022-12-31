@@ -72,7 +72,7 @@ export class ProductsController {
     }
     return this.productsService.updateProduct({
       where: { id: Number(id) },
-      dto,
+      data: dto,
     });
   }
 
