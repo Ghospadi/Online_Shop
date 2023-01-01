@@ -16,30 +16,8 @@ export class CategoriesService {
     return category;
   }
 
-  async findCategories(params: {
-    skip?: number;
-    take?: number;
-    currentPage?: number;
-    where?: Prisma.categoriesWhereInput;
-    orderBy?: Prisma.categoriesOrderByWithRelationInput;
-  }) {
-    const { skip, take, where, orderBy, currentPage } = params;
-
-    const result = await this.prisma.categories.findMany({
-      skip,
-      take,
-      where,
-      orderBy,
-    });
-
-    const totalResults = await this.prisma.categories.count();
-
-    return {
-      currentPage,
-      result,
-      totalPages: Math.ceil(totalResults / 10),
-      totalResults,
-    };
+  async findCategories() {
+    return await this.prisma.categories.findMany();
   }
 
   async create(dto: CreateCategoriesDto) {

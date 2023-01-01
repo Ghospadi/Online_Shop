@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { GetAllByWhereCategories } from './get-categories.dto';
 import { ConnectCategoriesDto } from '../generated/nestjs-dto/connect-categories.dto';
 import { UpdateCategoriesDto } from '../generated/nestjs-dto/update-categories.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -23,6 +22,11 @@ import { RolesGuard, Role } from 'src/auth/guards/role.guard';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @Get('all')
+  async findAll() {
+    return this.categoriesService.findCategories();
+  }
+
   @Get(':id')
   async find(@Param('id') id?: string) {
     const asyncResult = await this.categoriesService.findById({
@@ -32,20 +36,6 @@ export class CategoriesController {
       throw new NotFoundException(CATEGORY_NOT_FOUND);
     }
     return asyncResult;
-  }
-
-  @Post()
-  async findAll(@Body() dto: GetAllByWhereCategories) {
-    if (!dto.page) {
-      dto.page = 1;
-    }
-    return this.categoriesService.findCategories({
-      where: dto.where,
-      orderBy: dto.orderBy,
-      currentPage: dto.page,
-      skip: dto.page === 1 ? 0 : dto.page * 10 - 10,
-      take: 10,
-    });
   }
 
   @Post('create')

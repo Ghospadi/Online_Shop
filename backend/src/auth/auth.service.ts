@@ -49,7 +49,7 @@ export class AuthService {
       return addDays(new Date(), 7);
     }
 
-    // store token in database
+    // index token in database
     await this.prisma.tokens.create({
       data: {
         token,

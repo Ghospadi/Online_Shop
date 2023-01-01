@@ -37,7 +37,7 @@ export class ProductsController {
 
   @Post('all')
   async getAllProducts(@Body() dto: GetAllByWhereProducts) {
-    if (!dto.page) {
+    if (!dto.page && isNaN(dto.page)) {
       dto.page = 1;
     }
     return this.productsService.findProducts({
