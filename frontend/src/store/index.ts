@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
-import {useProducts} from "@/store/products";
-import {useCategories} from "@/store/categories";
+import {useCategories} from "./categories.js";
+import {useProducts} from "./products";
 
 export default createStore({
   modules: {

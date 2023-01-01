@@ -1,17 +1,17 @@
 <template>
-  <main>
-    <aside>
+  <div class="v-container d-flex flex-row">
+    <div class="w-25">
       <div>
         <span v-for="category in categories" :key="category.id">
           {{ category.name }}
         </span>
       </div>
-    </aside>
-    <section>
-      <h5>Products</h5>
+    </div>
+    <div class="v-container--fluid w-100 d-flex flex-column justify-center align-center">
+      <h2>Products</h2>
       <products-list :products="products"/>
-    </section>
-  </main>
+    </div>
+  </div>
 </template>
 
 <script>

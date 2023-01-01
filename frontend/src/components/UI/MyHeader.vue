@@ -22,7 +22,7 @@ export default {
 <style scoped>
 .MyHeader__nav {
   display: flex;
-  background: #757575;
+  background-color: #bdbdbd;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
