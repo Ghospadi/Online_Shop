@@ -44,15 +44,6 @@ export class OrdersService {
   }
 
   async createOrder(dto: CreateOrdersDto): Promise<Orders> {
-    dto.order_items.map(async (id) => {
-      const orderItem = await this.prisma.order_items.findFirst({
-        where: { id },
-      });
-      if (!orderItem) {
-        throw new NotFoundException(ORDER_ITEM_NOT_FOUND);
-      }
-    });
-
     const user = await this.prisma.users.findFirst({
       where: { id: dto.user_id },
     });
@@ -65,9 +56,6 @@ export class OrdersService {
       data: {
         total: dto.total,
         order_date: dto.order_date,
-        order_items: {
-          connect: dto.order_items.map((id) => ({ id })),
-        },
         users: {
           connect: {
             id: dto.user_id,

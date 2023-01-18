@@ -24,6 +24,9 @@ export class OrderItemsService {
       take,
       where,
       orderBy,
+      include: {
+        products: true,
+      },
     });
 
     const totalResults = await this.prisma.order_items.count();

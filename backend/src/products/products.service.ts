@@ -80,7 +80,9 @@ export class ProductsService {
         stock: data.stock,
         categories: {
           connect: {
-            id: data.category_id,
+            id: data.category_id
+              ? data.category_id
+              : Number(product.category_id),
           },
         },
       },
@@ -88,7 +90,6 @@ export class ProductsService {
     });
   }
 
-  @HttpCode(200)
   async deleteProduct(where: Prisma.productsWhereUniqueInput) {
     const product = await this.findProduct(where);
 

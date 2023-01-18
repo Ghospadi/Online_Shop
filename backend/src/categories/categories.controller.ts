@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   NotFoundException,
   Param,
   Patch,
@@ -67,6 +67,7 @@ export class CategoriesController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.ADMIN)
+  @HttpCode(200)
   async deleteCategoryById(@Param('id') id: string) {
     const asyncResult = await this.categoriesService.findById({
       id: Number(id),

@@ -18,6 +18,7 @@ export class CreateOrdersDto {
   order_date?: Date;
 
   @IsArray()
+  @IsOptional()
   @ValidateNested()
   @Type(() => Number)
   order_items?: number[];

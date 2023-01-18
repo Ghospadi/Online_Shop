@@ -1,4 +1,3 @@
-
 import {Orders} from './orders.entity'
 import {Reviews} from './reviews.entity'
 import {Tokens} from './tokens.entity'
@@ -8,6 +7,7 @@ export class Users {
   id: number ;
 name: string ;
 email: string ;
+age: number;
 password: string ;
 country: string ;
 city: string ;

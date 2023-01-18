@@ -2,6 +2,7 @@ import { IsNumber } from 'class-validator';
 
 export class UpdateUsersDto {
   name?: string;
+  age: number;
   email?: string;
   password?: string;
   country?: string;

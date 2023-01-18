@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpException, NotFoundException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 import { TOKEN_NOT_FOUND } from 'consts';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -67,10 +68,22 @@ export class AuthService {
     // hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
+    const user = await this.prisma.users.findFirst({
+      where: { email: userData.email },
+    });
+
+    if (user) {
+      throw new HttpException(
+        'This email already in use',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     // create user
     await this.prisma.users.create({
       data: {
         ...userData,
+        age: +userData.age,
         password: hashedPassword,
         role_id: 2,
       },

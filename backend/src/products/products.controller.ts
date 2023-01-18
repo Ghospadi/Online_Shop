@@ -6,7 +6,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   NotFoundException,
   Param,
   Patch,
@@ -43,7 +43,7 @@ export class ProductsController {
     return this.productsService.findProducts({
       where: dto.where,
       orderBy: dto.orderBy,
-      currentPage: dto.page,
+      currentPage: Number(dto.page),
       skip: dto.page === 1 ? 0 : dto.page * 10 - 10,
       take: 10,
     });
@@ -78,6 +78,7 @@ export class ProductsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.ADMIN)
+  @HttpCode(200)
   @Delete(':id')
   async deleteProductById(@Param('id') id: string) {
     const asyncResult = await this.productsService.findProduct({

@@ -6,7 +6,7 @@ import {
   Request,
   Body,
   ValidationPipe,
-  UsePipes,
+  UsePipes, Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
@@ -18,8 +18,8 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.body.email, req.body.password);
+  async login(@Body() body) {
+    return this.authService.login(body.email, body.password);
   }
 
   @UsePipes(new ValidationPipe())
@@ -30,7 +30,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
-  @Post('me')
+  @Get('me')
   async me(@Headers('Authorization') token: string): Promise<any> {
     const tokenData = token.split(' ')[1];
     return this.authService.me(tokenData);

@@ -15,8 +15,6 @@ import { Roles } from 'src/generated/nestjs-dto/roles.entity';
 export class RolesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.ADMIN)
   async findAll(params: {
     skip?: number;
     take?: number;
@@ -43,9 +41,7 @@ export class RolesService {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.ADMIN)
-  async findOne(id: Prisma.reviewsWhereUniqueInput): Promise<Roles> {
+  async findOne(id: Prisma.rolesWhereUniqueInput): Promise<Roles> {
     const role = await this.prisma.roles.findFirst({
       where: id,
     });
@@ -54,21 +50,9 @@ export class RolesService {
       throw new NotFoundException(ROLE_NOT_FOUND);
     }
 
-    const token = '1';
-
-    const existedToken = await this.prisma.tokens.findFirst({
-      where: { token },
-    });
-
-    if (!existedToken) {
-      throw new NotFoundException(TOKEN_NOT_FOUND);
-    }
-
     return role;
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.ADMIN)
   async create(dto: CreateRolesDto): Promise<Roles> {
     const role = await this.prisma.roles.findFirst({
       where: {
@@ -85,10 +69,8 @@ export class RolesService {
     });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.ADMIN)
   async update(
-    id: Prisma.reviewsWhereUniqueInput,
+    id: Prisma.rolesWhereUniqueInput,
     dto: UpdateRolesDto,
   ): Promise<Roles> {
     const role = await this.prisma.roles.findFirst({
@@ -105,9 +87,7 @@ export class RolesService {
     });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.ADMIN)
-  async delete(id: Prisma.reviewsWhereUniqueInput): Promise<void> {
+  async delete(id: Prisma.rolesWhereUniqueInput): Promise<void> {
     const role = await this.prisma.roles.findFirst({
       where: id,
     });

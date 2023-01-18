@@ -92,7 +92,6 @@ export class CategoriesService {
     return updatedCategory;
   }
 
-  @HttpCode(200)
   async deleteCategory(where: Prisma.categoriesWhereUniqueInput) {
     await this.prisma.categories.delete({
       where,
