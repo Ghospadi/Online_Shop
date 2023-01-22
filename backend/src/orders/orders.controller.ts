@@ -41,8 +41,8 @@ export class OrdersController {
       where: dto.where,
       orderBy: dto.orderBy,
       currentPage: dto.page,
-      skip: dto.page === 1 ? 0 : dto.page * 10 - 10,
-      take: 10,
+      skip: dto.page === 1 ? 0 : dto.page * 9 - 9,
+      take: 9,
     });
   }
 

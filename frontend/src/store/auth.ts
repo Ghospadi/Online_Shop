@@ -98,6 +98,7 @@ export const useAuth = {
             try {
                 const user = await axios.get(`${ import.meta.env.VITE_MYIP }:8080/api/auth/me`, { headers: { "Authorization" : `bearer ${context?.state.authToken}` }})
                 const { data } = await axios.get(`${ import.meta.env.VITE_MYIP }:8080/api/users/${user.data.id}`, { headers: { "Authorization" : `bearer ${context?.state.authToken}` }})
+                Cookies.set('user', JSON.stringify(data));
                 context?.commit('SET_USER_DATA', data)
             } catch (error) {
                 const e = error as AxiosError;

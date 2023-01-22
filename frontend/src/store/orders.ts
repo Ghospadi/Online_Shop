@@ -9,17 +9,40 @@ interface ProductCart {
     quantity: number,
 }
 
+interface OrderItems {
+        id: number,
+        order_id: number,
+        product_id: number,
+        quantity: number,
+        price: number,
+        products: Product,
+}
+
+interface Order {
+    currentPage: number,
+    result: [],
+    totalPages: number,
+    totalResults: number
+}
+
 export const useOrders = {
     state: {
+        orders: [] as OrderItems[],
         productCart: [] as ProductCart[],
         isCartModal: false as boolean,
+        totalPages: 0 as number,
+        currentOrderPage: 1 as number,
     },
     mutations: {
+        ADD_ORDERS(state: any, orders: { orderItems: [], order: Order }) {
+            state.orders = orders.orderItems;
+            state.totalPages = orders.order.totalPages;
+        },
         getProductCart(state: any) {
             const data = Cookies.get(`ProductCard`);
             let parsedData = [];
             if (typeof data === "string") {
-                parsedData = JSON.parse(data);
+                data ?  parsedData = JSON.parse(data) : parsedData = [];
             }
             state.productCart = parsedData;
         },
@@ -50,19 +73,45 @@ export const useOrders = {
         clearBucket(state: any) {
             state.productCart = [];
             Cookies.set(`ProductCard`, '', { expires: 1 });
+        },
+        clearOrders(state: any) {
+            state.orders = [];
         }
     },
     getters: {
         productCart: (state: any) => state.productCart,
         isCartModal: (state: any) => state.isCartModal,
+        orderItems: (state: any) => state.orders,
+        ordersPages: (state: any) => state.totalPages
     },
     actions: {
-        async makeOrder(context?: { commit: Commit, state: any }, { userId, products, order }) {
+        // @ts-ignore
+        async makeOrder(context?: { commit: Commit, state: any }, { userId, products, order }: any) {
             const token = Cookies.get('jwtToken')
-            console.log(token)
             try {
-                await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/create`, { total: order.total, order_date: order.date, user_id: userId }, { headers: { "Authorization" : `bearer ${token}` }});
+                const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/create`, { total: order.total, order_date: order.date, user_id: userId }, { headers: { "Authorization" : `bearer ${token}` }});
+                for(let i = 0; i < products.length; i++) {
+                    await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/create`, {quantity: products[i].quantity, price: products[i].product.price, product_id: products[i].product.id, order_id: data.id}, { headers: { "Authorization" : `bearer ${token}` }})
+                }
                 context?.commit('clearBucket')
+                context?.commit('toggleIsCartModal', false)
+                Notiflix.Notify.success('You create a new order')
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    console.log(e.message);
+                }
+            }
+        },
+        // @ts-ignore
+        async getOrderItems(context?: { commit: Commit, state: any }, payload: { userId: number, page: number}) {
+            const orderItems: any[] = []
+            try {
+                const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/all`, { page: payload.page, where: {user_id: payload.userId} });
+                for(let i = 0; i < data.result.length; i++) {
+                     const result = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/all`, {where: {order_id: data.result[i].id}});
+                     orderItems.push({ result: result.data.result, id: data.result[i].id });
+                }
+                context?.commit('ADD_ORDERS', { orderItems, order: data });
             } catch (e) {
                 if (axios.isAxiosError(e)) {
                     console.log(e.message);

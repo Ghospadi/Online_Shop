@@ -1,7 +1,8 @@
 <script>
 import MyHeader from "./components/UI/MyHeader.vue";
-import {mapActions, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import {useDisplay} from "vuetify";
+import Cookies from "js-cookie";
 export default {
   name: "App",
   components: {MyHeader},
@@ -12,11 +13,16 @@ export default {
     ...mapMutations(['setToken', 'getProductCart']),
     ...mapActions(['me'])
   },
+  computed: {
+    ...mapGetters(['authToken'])
+  },
   created() {
     this.setToken();
     this.getProductCart()
     this.display = useDisplay();
-    this.me();
+    if(this.authToken){
+      this.me();
+    }
   }
 }
 </script>

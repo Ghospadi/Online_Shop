@@ -13,7 +13,7 @@
       >
 
         <v-text-field
-            v-model="email"
+            v-model.trim="email"
             :rules="emailRules"
             label="E-mail"
             required
@@ -21,7 +21,7 @@
         ></v-text-field>
 
         <v-text-field
-            v-model="password"
+            v-model.trim="password"
             :counter="16"
             :rules="passwordRules"
             label="Password"
@@ -75,12 +75,12 @@ export default {
 
       if (!valid) return;
         const result = await this.userLogin({ email, password });
+        if(!result) return;
         this.setToken();
-        if(result) {
-          this.setAuthModal(false);
-        }
+        await this.me();
+        this.setAuthModal(false);
     },
-    ...mapActions(["userLogin"]),
+    ...mapActions(["userLogin", 'me']),
     ...mapMutations(['setAuthModal', 'setToken', "setRegisterModal"])
   },
   computed: {

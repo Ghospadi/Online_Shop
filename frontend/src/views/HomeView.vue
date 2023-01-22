@@ -23,7 +23,7 @@
       <products-list :display="display" :products="products" v-show="products.length !== 0"/>
       <auth-modal />
       <register-modal />
-      <order-cart-modal />
+      <order-cart-modal :display="display" />
     </div>
   </div>
 </template>
@@ -78,7 +78,7 @@ export default {
     ...mapMutations(['setAuthModal', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal'])
   },
   computed: {
-    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart']),
+    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user']),
     screenClassObject() {
       return {
         'justify-center align-center ml-2': this.display === 'xs',

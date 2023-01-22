@@ -27,13 +27,18 @@ export class OrdersService {
       orderBy,
     });
 
-    const totalResults = await this.prisma.orders.count();
+    const totalResults = await this.prisma.orders.aggregate({
+      where,
+      _count: true,
+    });
+
+    const { _count } = totalResults;
 
     return {
       currentPage,
       result,
-      totalPages: Math.ceil(totalResults / 10),
-      totalResults,
+      totalPages: Math.ceil(_count / 9),
+      totalResults: _count,
     };
   }
 

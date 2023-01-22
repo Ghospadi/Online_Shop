@@ -4,9 +4,9 @@
         :color="'#92B4EC'"
         prominent
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-show="display === 'xs'" class="text-white"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-show="display === 'xs'"></v-app-bar-nav-icon>
 
-      <div :class="{ 'nav__routeAndroid': display === 'xs', 'nav__route': display !== 'xs' }"  v-for="route in routes" :key="route.path">
+      <div :class="{ 'nav__routeAndroid': display === 'xs', 'nav__route': display !== 'xs' }" v-for="route in routes" :key="route.path">
         <router-link class="route__text" :to="route.path" @click="homeRedirect()">{{ route.name }}</router-link>
       </div>
 
@@ -14,15 +14,15 @@
 
       <div v-show="$route.path === '/'" :class="inputLengthCount()" class="wrap">
         <input type="text" class="input" v-model="searchQuery" @keyup.enter="getProductsByNameAndCategory({ query: searchQuery, id: selectedCategoryId })" :class="inputLengthCount()" placeholder="Поиск...  ">
-        <button class="fa" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
+        <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
       </div>
 
       <div v-show="$route.path === '/'">
-        <v-btn variant="text" class="text-white" icon="mdi-filter"></v-btn>
+        <v-btn variant="text" icon="mdi-filter"></v-btn>
       </div>
 
-      <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" class="text-white" icon="mdi-account"></v-btn>
-      <v-btn v-show="authToken" variant="text" @click.stop="navigateTo('profile')" class="text-white" icon="mdi-account"></v-btn>
+      <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" icon="mdi-account"></v-btn>
+      <v-btn v-show="authToken" variant="text" @click.stop="navigateTo('profile')" icon="mdi-account"></v-btn>
     </v-app-bar>
   <v-navigation-drawer
       v-model="drawer"
@@ -31,7 +31,7 @@
       v-if="this.display === 'xs'"
   >
     <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-      <button class="btn collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name)" v-for="(category, index) in categories" :key="category.id">
+      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name)" v-for="(category, index) in categories" :key="category.id">
         <v-icon
             start
             :icon="getIcon(icons, index)"
@@ -45,6 +45,7 @@
 <script>
 
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Cookies from "js-cookie";
 
 export default {
   name: "MyHeader",
@@ -56,6 +57,7 @@ export default {
       { path: '/', name: 'Home' },
     ],
     icons: [
+      'all-inclusive',
       'monitor',
       'laptop',
       'cellphone',
@@ -74,9 +76,10 @@ export default {
     toggleClass() {
       this.toggleSearchActive(!this.isSearchActive);
     },
-    navigateTo(route) {
+    async navigateTo(route) {
         this.$router.push({ name: route }).catch((error) => console.log(error));
         this.searchQuery = '';
+        await this.me();
         this.setCategoryId(0);
     },
     homeRedirect() {
@@ -109,11 +112,11 @@ export default {
       this.changeTitle(categoryName);
       this.drawer = false;
     },
-    ...mapActions(['getProductsByNameAndCategory', 'getProducts', 'getProductsByCategory']),
+    ...mapActions(['getProductsByNameAndCategory', 'getProducts', 'getProductsByCategory', 'me']),
     ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId']),
   },
   computed: {
-    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId']),
+    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user']),
   },
   props: {
     display: {
@@ -141,7 +144,7 @@ export default {
 }
 
 .route__text {
-  color: white;
+  color: black;
   font-size: 24px;
   text-decoration: none;
 }
