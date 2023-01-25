@@ -32,7 +32,7 @@
         <div class="d-flex justify-center mb-5">
           <h2>Orders</h2>
         </div>
-        <v-row class="d-flex flex-row flex-wrap justify-center align-start">
+        <v-row class="d-flex flex-row flex-wrap justify-center">
           <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
             <div>
               <v-card-text class="pa-0 text-h5"> Order № {{order.id + 1}}</v-card-text>
@@ -99,7 +99,7 @@ export default {
       this.$router.push('/').catch((error) => console.log(error));
     },
     async changeData(data) {
-      if(data.email === '' && data.age === '' && data.country === '' && data.city === '' && data.address === '') {
+      if(data.name === '' && data.email === '' && data.age === '' && data.country === '' && data.city === '' && data.address === '') {
         Notiflix.Notify.warning('You don\'t input any fields')
         return;
       }

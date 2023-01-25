@@ -49,7 +49,7 @@ export const useOrders = {
         addProduct(state: any, product: { id: number, name: string, price: number, image: string }) {
             let contains = false;
             for(let i = 0; i < state.productCart.length; i++) {
-                if (state.productCart[i].product.name === product.name) {
+                if (state.productCart[i].product.id === product.id) {
                     contains = true;
                 }
             }

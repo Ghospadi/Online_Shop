@@ -6,7 +6,7 @@ import {useOrders} from "./orders";
 
 export default createStore({
   state: {
-    mainTitle: 'Products',
+    mainTitle: 'Popular products',
     isSearchActive: false,
   },
   getters: {

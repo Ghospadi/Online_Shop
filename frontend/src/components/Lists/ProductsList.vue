@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row :class="{'d-flex justify-center align-center':display === 'xs'}">
-      <v-card class="mt-4 mr-4 border-s bg-shades-transparent card-scale" v-for="product in products" :key="product.id" @click="toggleSearchActive(false)" :width="display !== 'xs' ? 263.9 : 250">
+      <v-card class="mt-4 mr-4 border-s bg-shades-transparent card-scale" v-for="product in products" :key="product.id" @click="toggleSearchActive(false)" :width="display !== 'xs' ? 310 : 250">
         <v-img height="200" :src="product.image" cover></v-img>
         <v-card-title>{{product.name}}</v-card-title>
         <div class="d-flex">

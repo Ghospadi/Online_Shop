@@ -1,10 +1,9 @@
 <template>
-
     <v-app-bar
         :color="'#92B4EC'"
         prominent
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-show="display === 'xs'"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.stop="this.drawer = !this.drawer" v-show="display === 'xs'"></v-app-bar-nav-icon>
 
       <div :class="{ 'nav__routeAndroid': display === 'xs', 'nav__route': display !== 'xs' }" v-for="route in routes" :key="route.path">
         <router-link class="route__text" :to="route.path" @click="homeRedirect()">{{ route.name }}</router-link>
@@ -13,12 +12,12 @@
       <v-spacer></v-spacer>
 
       <div v-show="$route.path === '/'" :class="inputLengthCount()" class="wrap">
-        <input type="text" class="input" v-model="searchQuery" @keyup.enter="getProductsByNameAndCategory({ query: searchQuery, id: selectedCategoryId })" :class="inputLengthCount()" placeholder="Поиск...  ">
+        <input type="text" class="input" v-model.trim="searchQuery" @keyup.enter="searchItems(this.searchQuery, this.selectedCategoryId, this.priceSortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
         <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
       </div>
 
       <div v-show="$route.path === '/'">
-        <v-btn variant="text" icon="mdi-filter"></v-btn>
+        <v-btn  @click.stop="this.isFilter = !this.isFilter" variant="text" icon="mdi-filter"></v-btn>
       </div>
 
       <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" icon="mdi-account"></v-btn>
@@ -26,8 +25,6 @@
     </v-app-bar>
   <v-navigation-drawer
       v-model="drawer"
-      absolute
-      temporary
       v-if="this.display === 'xs'"
   >
     <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
@@ -38,6 +35,20 @@
         ></v-icon>
         {{ category.name }}
       </button>
+    </div>
+  </v-navigation-drawer>
+  <v-navigation-drawer
+      v-model="isFilter"
+      location="right"
+      width="300"
+  >
+    <div class="d-flex flex-column pa-1 justify-start">
+      <label class="label" for="standard-select">Sort by:</label>
+      <div class="select">
+        <select id="standard-select" @change="filterHandler($event.target.value)" v-model="sortType">
+          <option v-for="option in sortOptions" :disabled="option.disabled" :value="option.value">{{option.text}}</option>
+        </select>
+      </div>
     </div>
   </v-navigation-drawer>
 </template>
@@ -51,10 +62,16 @@ export default {
   name: "MyHeader",
   data: () => ({
     drawer: false,
+    isFilter: false,
     isActive: false,
     searchQuery: '',
+    sortType: '',
     routes: [
       { path: '/', name: 'Home' },
+    ],
+    sortOptions: [
+      { text: 'From cheap to expensive', value: 'asc', disabled: false },
+      { text: 'From expensive to cheap', value: 'desc', disabled: false },
     ],
     icons: [
       'all-inclusive',
@@ -85,17 +102,22 @@ export default {
     homeRedirect() {
       this.searchQuery = '';
       if(this.$route.path === '/profile') {
-        this.changeTitle('Products')
+        this.changeTitle('Popular products')
         this.getProducts(1);
         this.setCategoryId(0)
       }
       if(this.$route.path === '/') {
-        this.changeTitle('Products')
+        this.changeTitle('Popular products')
+        this.setPage(1);
         this.getProducts(1);
         this.toggleSearchActive(false)
         this.setCategoryId(0)
-        return;
       }
+    },
+    filterHandler(sortType) {
+      this.setPriceSortType(sortType);
+      this.getSortedProducts({ price: this.priceSortType, categoryId: this.selectedCategoryId })
+      this.isFilter = false;
     },
     inputLengthCount() {
       if(this.display === 'xs') return { activeAndroid: this.isSearchActive }
@@ -106,17 +128,24 @@ export default {
     },
     selectCategory(categoryId, categoryName) {
       this.searchQuery = '';
+      this.setPage(1);
       this.setCategoryId(categoryId);
       this.getProductsByCategory(categoryId, 1);
       this.$router.push('/')
       this.changeTitle(categoryName);
       this.drawer = false;
     },
-    ...mapActions(['getProductsByNameAndCategory', 'getProducts', 'getProductsByCategory', 'me']),
-    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId']),
+    searchItems(searchQuery, selectedCategoryId, priceSortType) {
+      if(!searchQuery) return;
+      this.$emit('query-data', searchQuery)
+      this.setPage(1);
+      this.getProductsByNameAndCategoryAndFilterType({ query: searchQuery, categoryId: selectedCategoryId, price: priceSortType })
+    },
+    ...mapActions(['getProductsByNameAndCategoryAndFilterType', 'getProducts', 'getProductsByCategory', 'me', 'getSortedProducts']),
+    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType']),
   },
   computed: {
-    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user']),
+    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType']),
   },
   props: {
     display: {
@@ -124,10 +153,51 @@ export default {
       required: true,
     }
   },
+  emits: ["query-data"]
 }
 </script>
 
 <style scoped>
+select {
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+  outline: 0;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+:root {
+  --select-border: #777;
+  --select-focus: blue;
+  --select-arrow: var(--select-border);
+}
+
+.select {
+  width: 100%;
+  min-width: 15ch;
+  max-width: 30ch;
+  border: 1px solid var(--select-border);
+  border-radius: 0.25em;
+  padding: 0.25em 0.5em;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1.1;
+  background-color: #fff;
+  background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
+}
+
+.label {
+  font-size: 32px;
+  text-align: center;
+}
+
 .nav__route {
   padding-left: 20px;
 }

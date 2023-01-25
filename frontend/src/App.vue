@@ -2,16 +2,19 @@
 import MyHeader from "./components/UI/MyHeader.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {useDisplay} from "vuetify";
-import Cookies from "js-cookie";
 export default {
   name: "App",
   components: {MyHeader},
   data: () => ({
-    display: {}
+    display: {},
+    query: '',
   }),
   methods: {
     ...mapMutations(['setToken', 'getProductCart']),
-    ...mapActions(['me'])
+    ...mapActions(['me']),
+    handleData(data) {
+      this.query = data
+    }
   },
   computed: {
     ...mapGetters(['authToken'])
@@ -33,8 +36,8 @@ export default {
       style="position: relative;"
   >
     <v-layout>
-      <MyHeader :display="display.name" />
-      <router-view :display="display.name"></router-view>
+      <MyHeader @query-data="handleData" :display="display.name" />
+      <router-view :query="query" :display="display.name"></router-view>
     </v-layout>
   </v-sheet>
 </template>

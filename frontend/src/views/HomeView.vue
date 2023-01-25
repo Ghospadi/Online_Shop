@@ -1,8 +1,8 @@
 <template>
-  <div class="v-container w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0 }">
+  <div class="v-container h-100 w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0 }">
     <div v-show="display !== 'xs'" class="border-e w-25">
       <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-        <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="selectedCategory(category.id, category.name)" v-for="(category, index) in categories" :key="category.id">
+        <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="selectedCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
           <v-icon
               start
               :icon="getIcon(icons, index)"
@@ -15,12 +15,16 @@
       <div class="cart" :data-totalitems="productCart.length">
         <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="src/assets/shopping-cart.svg"/></button>
       </div>
-      <h2 class="title">{{ mainTitle === 'All' ? 'Products' : mainTitle }}</h2>
+      <h2 class="title" ref="title">{{ mainTitle === 'All' ? 'All products' : mainTitle }}</h2>
       <div v-if="products.length === 0" class="d-flex justify-center align-center flex-column h-100 w-100">
         <img src="https://cdn-icons-png.flaticon.com/512/6134/6134116.png" width="150" height="150" alt="NotFoundPicture"/>
         <p class="mt-4">No products found with this name or category...</p>
       </div>
-      <products-list :display="display" :products="products" v-show="products.length !== 0"/>
+      <div class="d-flex flex-column" :class="display === 'xs' ? (products.length < 2 ? 'h-screen' : null) : null">
+        <products-list :display="display" :products="products" v-show="products.length !== 0"/>
+        <v-divider class="mt-2 mb-2"></v-divider>
+        <button v-if="totalPages !== currentPage && totalPages !== 0" @click="additionalItemsHandler()" class="moreButton text-h3"> <v-icon>mdi-all-inclusive</v-icon> More items...</button>
+      </div>
       <auth-modal />
       <register-modal />
       <order-cart-modal :display="display" />
@@ -68,17 +72,25 @@ export default {
     getIcon(icons, index) {
       return `mdi-${this.icons[index]}`
     },
-    selectedCategory(categoryId, categoryName) {
+    selectedCategory(categoryId, categoryName, price) {
       if(categoryId === this.selectedCategoryId) return;
       this.setCategoryId(categoryId);
-      this.getProductsByCategory(categoryId, 1);
+      this.setPage(1);
+      this.getProductsByCategory({ categoryId, price, page: 1 });
       this.changeTitle(categoryName);
     },
-    ...mapActions(['getProducts', 'getCategories', 'userLogin', 'getProductsByCategory']),
-    ...mapMutations(['setAuthModal', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal'])
+    additionalItemsHandler() {
+      if( this.currentPage === this.totalPages ) {
+        return
+      }
+      this.addPage(1);
+      this.getProductsByPage({ query: this.query, categoryId: this.selectedCategoryId, page: this.currentPage, price: this.priceSortType })
+    },
+    ...mapActions(['getProducts', 'getCategories', 'userLogin', 'getProductsByCategory', 'getProductsByPage']),
+    ...mapMutations(['setAuthModal', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal', 'setPage', 'addPage'])
   },
   computed: {
-    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user']),
+    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user', 'currentPage', 'totalPages', 'priceSortType']),
     screenClassObject() {
       return {
         'justify-center align-center ml-2': this.display === 'xs',
@@ -88,11 +100,19 @@ export default {
   },
   props: {
     display: String,
+    query: {
+      type: String,
+      default: '',
+    }
   }
 }
 </script>
 
 <style scoped>
+.moreButton:hover {
+  color: #92B4EC;
+}
+
 .btn {
   width: 75vh;
   text-align: left;
