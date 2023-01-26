@@ -5,10 +5,10 @@ import {Products} from './products.entity'
 
 export class OrderItems {
   id: number ;
-order_id: number ;
-product_id: number ;
+order_id: number  | null;
+product_id: number  | null;
 quantity: number  | null;
 price: number  | null;
-orders?: Orders ;
-products?: Products ;
+orders?: Orders  | null;
+products?: Products  | null;
 }

@@ -11,6 +11,10 @@ export class CreateProductsDto {
   @IsOptional()
   price?: number;
 
+  @IsNumber()
+  @IsOptional()
+  rating?: number;
+
   @IsString()
   @IsOptional()
   image?: string;

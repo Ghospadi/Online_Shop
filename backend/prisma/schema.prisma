@@ -5,15 +5,15 @@ generator client {
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
   output                          = "../src/generated/nestjs-dto"
-  createDtoPrefix                 = "Create"
-  dtoSuffix                       = "Dto"
-  entityPrefix                    = ""
-  reExport                        = "false"
-  entitySuffix                    = ""
-  exportRelationModifierClasses   = "true"
-  updateDtoPrefix                 = "Update"
   outputToNestJsResourceStructure = "false"
+  exportRelationModifierClasses   = "true"
   fileNamingStyle                 = "camel"
+  createDtoPrefix                 = "Create"
+  entitySuffix                    = ""
+  updateDtoPrefix                 = "Update"
+  entityPrefix                    = ""
+  dtoSuffix                       = "Dto"
+  reExport                        = "false"
 }
 
 datasource db {
@@ -48,6 +48,7 @@ model products {
   name        String?       @db.VarChar(255)
   description String?       @db.MediumText
   price       Float?        @db.Float
+  rating      Int?          @default(0) @db.TinyInt
   image       String?       @db.VarChar(255)
   stock       Int?          @db.TinyInt
   category_id Int?

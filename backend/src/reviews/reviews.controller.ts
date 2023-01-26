@@ -32,7 +32,7 @@ export class ReviewsController {
   constructor(private readonly reviewService: ReviewsService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.USER)
+  @RolesDecorator(Role.USER, Role.ADMIN)
   @Post()
   async create(@Body() review: CreateReviewsDto): Promise<Reviews> {
     return this.reviewService.create(review);

@@ -13,6 +13,10 @@ export class UpdateProductsDto {
   @IsOptional()
   price?: number;
 
+  @IsNumber()
+  @IsOptional()
+  rating?: number;
+
   @IsString()
   @IsOptional()
   image?: string;
