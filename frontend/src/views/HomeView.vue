@@ -73,8 +73,10 @@ export default {
       return `mdi-${this.icons[index]}`
     },
     selectedCategory(categoryId, categoryName, price) {
-      if(categoryId === this.selectedCategoryId) return;
+      if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
+      this.clearSearchQuery();
       this.setCategoryId(categoryId);
+      this.toggleSearchActive(false);
       this.setPage(1);
       this.getProductsByCategory({ categoryId, price, page: 1 });
       this.changeTitle(categoryName);
@@ -84,13 +86,13 @@ export default {
         return
       }
       this.addPage(1);
-      this.getProductsByPage({ query: this.query, categoryId: this.selectedCategoryId, page: this.currentPage, price: this.priceSortType })
+      this.getProductsByPage({ query: this.searchQuery, categoryId: this.selectedCategoryId, page: this.currentPage, price: this.priceSortType })
     },
     ...mapActions(['getProducts', 'getCategories', 'userLogin', 'getProductsByCategory', 'getProductsByPage']),
-    ...mapMutations(['setAuthModal', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal', 'setPage', 'addPage'])
+    ...mapMutations(['setAuthModal', 'toggleSearchActive', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal', 'setPage', 'addPage', 'clearSearchQuery'])
   },
   computed: {
-    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user', 'currentPage', 'totalPages', 'priceSortType']),
+    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user', 'currentPage', 'totalPages', 'priceSortType', 'searchQuery']),
     screenClassObject() {
       return {
         'justify-center align-center ml-2': this.display === 'xs',
@@ -100,10 +102,6 @@ export default {
   },
   props: {
     display: String,
-    query: {
-      type: String,
-      default: '',
-    }
   }
 }
 </script>

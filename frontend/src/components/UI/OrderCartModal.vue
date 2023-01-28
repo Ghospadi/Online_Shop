@@ -44,7 +44,7 @@
             <p class="text-h4" :class="{'pr-4': display !== 'xs' }">{{ calculatedPrice }} €</p>
             <v-btn
                 class="bg-green-lighten-1"
-                @click="makeOrder({ userId: user.id, products: productCart, order: { total: productCart.length, date: new Date() } })"
+                @click="createOrder(user.id, productCart,{ total: productCart.length, date: new Date() } )"
             >
               Make Order
             </v-btn>
@@ -57,6 +57,7 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Notiflix from "notiflix";
 
 export default {
   name: "OrderCartModal.vue",
@@ -64,6 +65,13 @@ export default {
 
   }),
   methods: {
+    createOrder(userId, products, order) {
+      if(products.length === 0) {
+        Notiflix.Notify.failure("You can't create order without products");
+        return;
+      }
+      this.makeOrder({ userId, products, order })
+    },
     ...mapMutations(['toggleIsCartModal', 'removeProduct']),
     ...mapActions(['makeOrder']),
   },

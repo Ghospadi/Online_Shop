@@ -40,7 +40,7 @@
             <div class="d-flex orderItem border w-100 ma-2" :data-quantity="item.quantity" v-for="item in order.result" :key="item.id">
               <div class="d-flex w-100">
                   <div class="d-flex">
-                    <img :width="display === 'xs' ? 75 : 120" :height="display === 'xs' ? 50 : null" :src="item.products.image" :alt="item.products.name"/>
+                    <img :width="display === 'xs' ? 75 : 85" :height="display === 'xs' ? 75 : 85" :src="item.products.image" :alt="item.products.name"/>
                   </div>
                   <div class="d-flex align-center text text-wrap pl-3">
                     {{ item.products.name }}
@@ -168,7 +168,6 @@ input:invalid {
 
 .orderItem {
   width: 80vh;
-  height: 8.5vh;
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }

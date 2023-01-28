@@ -98,7 +98,7 @@ export const useOrders = {
                 Notiflix.Notify.success('You create a new order')
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    console.log(e.message);
+                    Notiflix.Notify.failure(e.message)
                 }
             }
         },
@@ -108,13 +108,13 @@ export const useOrders = {
             try {
                 const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/all`, { page: payload.page, where: {user_id: payload.userId} });
                 for(let i = 0; i < data.result.length; i++) {
-                     const result = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/all`, {where: {order_id: data.result[i].id}});
+                     const result = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/all`, { where: {order_id: data.result[i].id}});
                      orderItems.push({ result: result.data.result, id: data.result[i].id });
                 }
                 context?.commit('ADD_ORDERS', { orderItems, order: data });
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    console.log(e.message);
+                    Notiflix.Notify.failure(e.message)
                 }
             }
         },

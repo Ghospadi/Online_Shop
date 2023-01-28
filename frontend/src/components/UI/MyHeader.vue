@@ -12,7 +12,7 @@
       <v-spacer></v-spacer>
 
       <div v-show="$route.path === '/'" :class="inputLengthCount()" class="wrap">
-        <input type="text" class="input" v-model.trim="searchQuery" @keyup.enter="searchItems(this.searchQuery, this.selectedCategoryId, this.priceSortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
+        <input type="text" class="input" v-model.trim="query" @keyup.enter="searchItems(this.query, this.selectedCategoryId, this.priceSortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
         <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
       </div>
 
@@ -64,7 +64,7 @@ export default {
     drawer: false,
     isFilter: false,
     isActive: false,
-    searchQuery: '',
+    query: '',
     sortType: '',
     routes: [
       { path: '/', name: 'Home' },
@@ -94,13 +94,18 @@ export default {
       this.toggleSearchActive(!this.isSearchActive);
     },
     async navigateTo(route) {
+        if(route === 'profile') {
+          this.isFilter = false;
+        }
         this.$router.push({ name: route }).catch((error) => console.log(error));
-        this.searchQuery = '';
+        this.query = '';
+        this.clearSearchQuery();
         await this.me();
         this.setCategoryId(0);
     },
     homeRedirect() {
-      this.searchQuery = '';
+      this.query = '';
+      this.clearSearchQuery();
       if(this.$route.path === '/profile') {
         this.changeTitle('Popular products')
         this.getProducts(1);
@@ -116,7 +121,8 @@ export default {
     },
     filterHandler(sortType) {
       this.setPriceSortType(sortType);
-      this.getSortedProducts({ price: this.priceSortType, categoryId: this.selectedCategoryId })
+      this.getSortedProducts({ price: this.priceSortType, categoryId: this.selectedCategoryId, query: this.searchQuery })
+      this.sortType = '';
       this.isFilter = false;
     },
     inputLengthCount() {
@@ -127,9 +133,11 @@ export default {
       return `mdi-${this.icons[index]}`
     },
     selectCategory(categoryId, categoryName) {
-      this.searchQuery = '';
+      this.query = '';
+      this.clearSearchQuery();
       this.setPage(1);
       this.setCategoryId(categoryId);
+      this.toggleSearchActive(false)
       this.getProductsByCategory(categoryId, 1);
       this.$router.push('/')
       this.changeTitle(categoryName);
@@ -137,23 +145,23 @@ export default {
     },
     searchItems(searchQuery, selectedCategoryId, priceSortType) {
       if(!searchQuery) return;
-      this.$emit('query-data', searchQuery)
+      this.setSearchQuery(searchQuery);
       this.setPage(1);
       this.getProductsByNameAndCategoryAndFilterType({ query: searchQuery, categoryId: selectedCategoryId, price: priceSortType })
+      this.query = '';
     },
     ...mapActions(['getProductsByNameAndCategoryAndFilterType', 'getProducts', 'getProductsByCategory', 'me', 'getSortedProducts']),
-    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType']),
+    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType', 'setSearchQuery', 'clearSearchQuery']),
   },
   computed: {
-    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType']),
+    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType', 'searchQuery']),
   },
   props: {
     display: {
       type: String,
       required: true,
     }
-  },
-  emits: ["query-data"]
+  }
 }
 </script>
 

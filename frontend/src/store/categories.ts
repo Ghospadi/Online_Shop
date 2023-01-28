@@ -1,6 +1,7 @@
 import axios from "axios";
 import {Commit} from "vuex";
 import {reactive} from "vue";
+import Notiflix from "notiflix";
 
 interface Category {
     id: number,
@@ -30,7 +31,7 @@ export const useCategories = {
                 context?.commit("GET_CATEGORIES", data);
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    console.log(e.message);
+                    Notiflix.Notify.failure(e.message)
                 }
             }
         }
