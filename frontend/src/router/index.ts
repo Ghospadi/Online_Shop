@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory, RouterOptions} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import ItemView from '../views/ItemView.vue'
 
 const routes = [
   {
@@ -14,6 +15,12 @@ const routes = [
     name: 'profile',
     component: ProfileView,
     props: true
+  },
+  {
+   path: '/item/:id',
+   name: 'ItemView',
+   component: ItemView,
+   props: true
   }
 ]
 

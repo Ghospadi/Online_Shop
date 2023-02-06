@@ -17,7 +17,7 @@
       </div>
 
       <div v-show="$route.path === '/'">
-        <v-btn  @click.stop="this.isFilter = !this.isFilter" variant="text" icon="mdi-filter"></v-btn>
+        <v-btn  @click.stop="toggleIsFilter(!this.isFilter)" variant="text" icon="mdi-filter"></v-btn>
       </div>
 
       <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" icon="mdi-account"></v-btn>
@@ -39,6 +39,8 @@
   </v-navigation-drawer>
   <v-navigation-drawer
       v-model="isFilter"
+      :model-value="isFilter"
+      @update:modelValue="toggleIsFilter(!isFilter)"
       location="right"
       width="300"
   >
@@ -62,7 +64,6 @@ export default {
   name: "MyHeader",
   data: () => ({
     drawer: false,
-    isFilter: false,
     isActive: false,
     query: '',
     sortType: '',
@@ -95,7 +96,7 @@ export default {
     },
     async navigateTo(route) {
         if(route === 'profile') {
-          this.isFilter = false;
+          this.toggleIsFilter(false);
         }
         this.$router.push({ name: route }).catch((error) => console.log(error));
         this.query = '';
@@ -123,7 +124,7 @@ export default {
       this.setPriceSortType(sortType);
       this.getSortedProducts({ price: this.priceSortType, categoryId: this.selectedCategoryId, query: this.searchQuery })
       this.sortType = '';
-      this.isFilter = false;
+      this.toggleIsFilter(false);
     },
     inputLengthCount() {
       if(this.display === 'xs') return { activeAndroid: this.isSearchActive }
@@ -151,10 +152,10 @@ export default {
       this.query = '';
     },
     ...mapActions(['getProductsByNameAndCategoryAndFilterType', 'getProducts', 'getProductsByCategory', 'me', 'getSortedProducts']),
-    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType', 'setSearchQuery', 'clearSearchQuery']),
+    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType', 'setSearchQuery', 'clearSearchQuery', 'toggleIsFilter']),
   },
   computed: {
-    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType', 'searchQuery']),
+    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType', 'searchQuery', 'isFilter']),
   },
   props: {
     display: {

@@ -1,7 +1,7 @@
 <template>
   <v-dialog
       ref="form"
-      v-model="isAuthModal"
+      :model-value="isAuthModal"
       @update:modelValue="setAuthModal(false)"
   >
     <v-card class="pa-6">
