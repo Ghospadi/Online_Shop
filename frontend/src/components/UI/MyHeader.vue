@@ -28,7 +28,7 @@
       v-if="this.display === 'xs'"
   >
     <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name)" v-for="(category, index) in categories" :key="category.id">
+      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
         <v-icon
             start
             :icon="getIcon(icons, index)"
@@ -141,14 +141,13 @@ export default {
     getIcon(icons, index) {
       return `mdi-${this.icons[index]}`
     },
-    selectCategory(categoryId, categoryName) {
-      this.query = '';
+    selectCategory(categoryId, categoryName, price) {
+      if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
       this.clearSearchQuery();
-      this.setPage(1);
       this.setCategoryId(categoryId);
-      this.toggleSearchActive(false)
-      this.getProductsByCategory(categoryId, 1);
-      this.$router.push('/')
+      this.toggleSearchActive(false);
+      this.setPage(1);
+      this.getProductsByCategory({ categoryId, price, page: 1 });
       this.changeTitle(categoryName);
       this.drawer = false;
     },

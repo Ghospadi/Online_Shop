@@ -1,87 +1,85 @@
 <template>
-  <div class="v-container d-flex flex-column w-100 mt-16">
-    <div class="product-container">
-      <div class="product-left">
+  <v-container fluid>
+    <v-row :class="{ 'product-container': display !== 'xs' }" class="mt-16">
+      <v-col cols="12" md="6">
         <img class="product-image" :src="product.image" alt="product image">
-      </div>
-      <div class="product-right">
+      </v-col>
+      <v-col cols="12" md="6">
         <h1 class="product-name">{{product.name}} </h1>
-        <div class="d-flex border w-100 mt-6 rounded-lg pa-4 justify-space-between align-center">
-          <h3 class="ml-3 product-price">{{ product.price }} €</h3>
-          <v-rating
-              readonly
-              class="d-flex justify-center align-center"
-              empty-icon="mdi-star-outline"
-              full-icon="mdi-star"
-              half-icon="mdi-star-half-full"
-              length="5"
-              size="48"
-              v-model="product.rating"
-          ></v-rating>
-          <v-btn @click.prevent.stop="addProduct({ id: product.id, name: product.name, price: product.price, image: product.image })" class="float-right mr-2" :border="false" :elevation="0">
-            <v-icon size="large" icon="mdi-cart-variant" />
-          </v-btn>
-        </div>
-        <div class="product-description">
-          <h2 class="product-description-header mt-6 mb-2">Description</h2>
-          <p class="product-description-text">{{product.description}}</p>
-        </div>
-      </div>
-    </div>
-    <div class="d-flex flex-column product-reviews mt-10">
-      <div class="d-flex ml-auto mr-auto align-center justify-space-between w-50">
-        <h2 class="review-article">Reviews:</h2>
+        <v-row class="d-flex mt-6">
+          <v-col cols="12" class="d-flex border rounded-lg align-center justify-space-between">
+            <h3 class="ml-3 product-price">{{ product.price }} €</h3>
+            <v-rating
+                readonly
+                class="d-flex justify-center align-center"
+                empty-icon="mdi-star-outline"
+                full-icon="mdi-star"
+                half-icon="mdi-star-half-full"
+                length="5"
+                :size="display === 'xs' ? 28 : 48"
+                v-model="product.rating"
+            ></v-rating>
+            <v-btn @click.prevent.stop="addProduct({ id: product.id, name: product.name, price: product.price, image: product.image })" class="ml-2" :border="false" :elevation="0">
+              <v-icon size="large" icon="mdi-cart-variant" />
+            </v-btn>
+          </v-col>
+        </v-row>
+        <h2 class="product-description-header mt-6 mb-2">Description</h2>
+        <p class="product-description-text">{{product.description}}</p>
+      </v-col>
+    </v-row>
+    <v-row class="mt-10">
+      <v-col cols="12" class="d-flex flex-row justify-center align-center">
+        <h2 class="review-article" :class="{'mr-8 ml-8': display === 'xs', 'mr-16 ml-16': display !== 'xs'}">Reviews:</h2>
         <v-btn
             color="#92B4EC"
             class="mt-2 mb-2"
+            :class="{'mr-8 ml-8': display === 'xs', 'mr-16 ml-16': display !== 'xs'}"
             @click="toggleIsReview(true)"
         >
           Add New Review
         </v-btn>
-      </div>
-      <div v-if="reviews.length !== 0" class="existing-reviews d-flex flex-column align-center justify-center">
-        <v-col
-            align-self="center"
-            cols="3"
-            sm="2"
-        >
-          <v-select
-              :items="sortOptions"
-              v-model="sortType"
-              item-value="value"
-              item-title="text"
-              item-disabled="disabled"
-              label="Order By"
-              @update:modelValue="selectSortType()"
-          ></v-select>
-        </v-col>
-        <div v-for="review in reviews" class="review border">
-          <div class="d-flex justify-space-between pa-4">
+      </v-col>
+      <v-col v-if="reviews.length !== 0" cols="12" class="existing-reviews d-flex flex-column align-center">
+        <v-select
+            :items="sortOptions"
+            v-model="sortType"
+            item-value="value"
+            item-title="text"
+            item-disabled="disabled"
+            label="Order By"
+            class="sort-field"
+            @update:modelValue="selectSortType()"
+        ></v-select>
+        <v-row v-for="review in reviews" class="border mt-6" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+          <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
             <h4>{{ review.users.name }}</h4>
             <p>{{ review.timestamp.split('T')[0] }}</p>
-          </div>
-          <v-divider/>
-          <h5 class="text-center mt-6">{{ review.review }}</h5>
-          <v-rating
-              readonly
-              class="d-flex justify-center align-center"
-              empty-icon="mdi-star-outline"
-              full-icon="mdi-star"
-              half-icon="mdi-star-half-full"
-              length="5"
-              size="48"
-              v-model="review.rating"
-          ></v-rating>
-        </div>
-        <div class="mt-2">
+          </v-col>
+          <v-divider></v-divider>
+          <v-col cols="12">
+            <h5 class="text-center mt-6">{{ review.review }}</h5>
+            <v-rating
+                readonly
+                class="d-flex justify-center align-center"
+                empty-icon="mdi-star-outline"
+                full-icon="mdi-star"
+                half-icon="mdi-star-half-full"
+                length="5"
+                size="48"
+                v-model="review.rating"
+            ></v-rating>
+          </v-col>
+        </v-row>
+        <v-col class="mt-2" cols="12">
           <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ id: +$route.params.id, page, sortType })"></v-pagination>
-        </div>
-      </div>
-      <div class="d-flex flex-column justify-center align-center" v-else>
+        </v-col>
+      </v-col>
+      <v-col v-else cols="12" class="d-flex flex-column justify-center align-center">
         <img src="https://cdn-icons-png.flaticon.com/512/6134/6134116.png" width="150" height="150" alt="NotFoundPicture"/>
         <p class="mt-4 text-h4">No review...</p>
-      </div>
-    </div>
+      </v-col>
+    </v-row>
     <div class="cart" :data-totalitems="productCart.length">
       <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="../assets/shopping-cart.svg" alt="cart"/></button>
     </div>
@@ -89,7 +87,7 @@
     <register-modal />
     <order-cart-modal :display="display" />
     <review-modal />
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -134,31 +132,16 @@ export default {
 </script>
 
 <style scoped>
+
 .product-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: black;
-  height: 90vh;
-}
-
-.product-left {
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  width: 50%;
-}
-
-.product-right {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  height: 100%;
-  width: 50%;
+  height: 88vh
 }
 
 .product-image {
-  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .product-name {
@@ -168,11 +151,6 @@ export default {
 
 .product-price {
   font-size: 28px;
-}
-
-.product-description {
-  display: flex;
-  flex-direction: column;
 }
 
 .product-description-header {
@@ -193,6 +171,15 @@ export default {
 .review {
   width: 65vh;
   margin-bottom: 10px;
+}
+
+.phone-review {
+  width: 45vh;
+  margin-bottom: 10px;
+}
+
+.sort-field {
+  width: 25vh
 }
 
 .cart {
