@@ -1,5 +1,5 @@
 <template>
-  <div class="v-container h-100 w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0 }">
+  <div class="v-container w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0 }">
     <div v-show="display !== 'xs'" class="border-e w-25">
       <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
         <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="selectedCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
@@ -13,7 +13,7 @@
     </div>
     <div class="v-container--fluid w-100 d-flex flex-column" :class="screenClassObject">
       <div class="cart" :data-totalitems="productCart.length">
-        <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="src/assets/shopping-cart.svg"/></button>
+        <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="src/assets/shopping-cart.svg" alt="cart"/></button>
       </div>
       <h2 class="title" ref="title">{{ mainTitle === 'All' ? 'All products' : mainTitle }}</h2>
       <div v-if="products.length === 0" class="d-flex justify-center align-center flex-column h-100 w-100">

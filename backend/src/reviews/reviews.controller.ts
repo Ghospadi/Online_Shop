@@ -16,12 +16,11 @@ import { ConnectReviewsDto } from '../generated/nestjs-dto/connect-reviews.dto';
 import { UpdateReviewsDto } from '../generated/nestjs-dto/update-reviews.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreateReviewsDto } from '../generated/nestjs-dto/create-reviews.dto';
-import {REVIEW_ALREADY_EXISTS, REVIEW_NOT_FOUND} from 'consts';
+import { REVIEW_ALREADY_EXISTS, REVIEW_NOT_FOUND } from 'consts';
 import { RolesDecorator } from 'src/auth/decorator/roles.decorator';
 import { RolesGuard, Role } from 'src/auth/guards/role.guard';
-import {ExceptionHandler} from "@nestjs/core/errors/exception-handler";
-import {HttpException} from "@nestjs/common/exceptions";
-import {HttpStatus} from "@nestjs/common/enums";
+import { HttpException } from '@nestjs/common/exceptions';
+import { HttpStatus } from '@nestjs/common/enums';
 
 export interface ReviewsPayload {
   currentPage: number;
@@ -34,15 +33,23 @@ export interface ReviewsPayload {
 export class ReviewsController {
   constructor(private readonly reviewService: ReviewsService) {}
 
+  @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.USER, Role.ADMIN)
-  @Post()
   async create(@Body() review: CreateReviewsDto) {
     try {
-      await this.reviewService.create(review);
+      await this.reviewService.createReview(review);
     } catch (e) {
-      if(e.message.includes('A review for this product by this user already exists.')) {
-        throw new NotFoundException(REVIEW_ALREADY_EXISTS);
+      if (
+        e.message.includes(
+          'A review for this product by this user already exists.',
+        )
+      ) {
+        console.log(1);
+        throw new NotFoundException({
+          status: HttpStatus.BAD_REQUEST,
+          error: REVIEW_ALREADY_EXISTS,
+        });
       } else {
         throw new HttpException('Error', HttpStatus.BAD_REQUEST);
       }
@@ -58,8 +65,8 @@ export class ReviewsController {
       where: dto.where,
       orderBy: dto.orderBy,
       currentPage: dto.page,
-      skip: dto.page === 1 ? 0 : dto.page * 10 - 10,
-      take: 10,
+      skip: dto.page === 1 ? 0 : dto.page * 4 - 4,
+      take: 4,
     });
   }
 
