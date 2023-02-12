@@ -5,6 +5,7 @@ import {useAuth} from "./auth";
 import {useOrders} from "./orders";
 import {useProduct} from "./product";
 import {useReviews} from "./reviews";
+import {useUsers} from "./users";
 
 export default createStore({
   state: {
@@ -40,5 +41,6 @@ export default createStore({
     useAuth,
     useOrders,
     useReviews,
+    useUsers,
   }
 })

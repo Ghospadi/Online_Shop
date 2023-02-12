@@ -26,7 +26,6 @@ export class UsersController {
   @RolesDecorator(Role.ADMIN)
   @Post('all')
   async findAll(@Body() dto: GetAllByWhereUsers) {
-    console.log(dto);
     if (!dto.page) {
       dto.page = 1;
     }

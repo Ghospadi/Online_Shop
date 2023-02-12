@@ -34,7 +34,7 @@
             background-color="indigo"
             dark
             v-model="tab"
-            @update:modelValue="getUserOrdersAndReviews(tab, true)"
+            @update:modelValue="getUserOrdersAndReviewsAndUsers(tab, true)"
         >
           <v-tab :value="1">
             Orders
@@ -42,16 +42,23 @@
           <v-tab :value="2">
             Reviews
           </v-tab>
+          <v-tab v-if="user.role_id === 1" :value="3">
+            Users
+          </v-tab>
         </v-tabs>
         <v-window v-model="tab">
           <v-window-item
-              v-for="n in 2"
+              v-for="n in 3"
               :key="n"
               :value="n"
           >
             <v-container fluid>
-              <div class="d-flex justify-center mb-5">
-                <h2>{{ n === 1 ? 'Orders' : 'Reviews' }}</h2>
+              <div class="d-flex justify-center mb-10 mt-4">
+                <h2>{{ n === 1 ? 'Orders' : null }} {{ n === 2 ? 'Reviews' : null }} {{ n === 3 ? 'Users' : null  }}</h2>
+                <div v-show="n === 3" :class="inputLengthCount()" class="wrap">
+                  <input type="text" class="input" v-model.trim="query" @keyup.enter="searchItems(this.query, this.selectedCategoryId, this.priceSortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
+                  <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
+                </div>
               </div>
               <v-row v-if="n === 1 && orderItems.length !== 0" class="d-flex flex-row flex-wrap justify-center">
                 <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
@@ -104,12 +111,30 @@
                   </v-col>
                 </v-col>
               </v-row>
+              <v-row class="d-flex flex-column justify-center align-center" v-else-if="n === 3 && users.length !== 0">
+                <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+                  <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
+                    <h4 class="text-center">{{ user.id }}</h4>
+                    <h5 class="text-center" style="width: 55vh">{{ user.name }} ({{user.email}}) </h5>
+                    <p class="text-center">{{ user.country }}</p>
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col cols="12" class="pa-1">
+                    <h5 style="word-wrap: break-word;" class="pt-4">{{ user.city }} {{ user.address }}</h5>
+                  </v-col>
+                  <v-col class="d-flex justify-end pa-1">
+                    <v-btn @click.stop="editReview(user.id)" color="warning">
+                      ManageUser
+                    </v-btn>
+                  </v-col>
+                </v-col>
+              </v-row>
               <v-col v-else cols="12" class="d-flex flex-column justify-center align-center">
                 <img src="https://cdn-icons-png.flaticon.com/512/6134/6134116.png" width="150" height="150" alt="NotFoundPicture"/>
                 <p class="mt-4 text-h4">No data...</p>
               </v-col>
               <div class="mt-2">
-                <v-pagination :total-visible="5" v-model="page" :length="n === 1 ? ordersPages : totalReviewsPages" @update:modelValue="getUserOrdersAndReviews(n, false)"></v-pagination>
+                <v-pagination :total-visible="5" v-model="page" :length="totalPages" @update:modelValue="getUserOrdersAndReviewsAndUsers(n, false)"></v-pagination>
               </div>
             </v-container>
           </v-window-item>
@@ -143,6 +168,7 @@ export default {
     country: '',
     city: '',
     address: '',
+    query: '',
   }),
   created() {
     const user = Cookies.get('user')
@@ -174,28 +200,55 @@ export default {
       await this.updateProfile(result);
       await this.me();
     },
+    inputLengthCount() {
+      if(this.display === 'xs') return { activeAndroid: this.isSearchActive }
+      return { active: this.isSearchActive }
+    },
+    toggleClass() {
+      this.toggleSearchActive(!this.isSearchActive);
+    },
+    searchItems(searchQuery) {
+      if(!searchQuery) return;
+      this.page = 1
+      this.setSearchQuery(searchQuery);
+      this.searchUsers({ email: { contains: this.searchQuery } })
+      this.query = '';
+    },
     editReview(reviewId) {
       this.getReviewById(reviewId)
       this.toggleIsReview(true)
     },
-    getUserOrdersAndReviews(panelId, flag) {
+    getUserOrdersAndReviewsAndUsers(panelId, flag) {
       if(flag) {
         this.page = 1;
+        this.setSearchQuery(null)
+        this.toggleSearchActive(false)
       }
       if(panelId === 1) {
         this.getOrderItems({ userId: +this.userId, page: this.page })
-      } else {
+      } else if(panelId === 2) {
         this.getReviewsByPageAndUserIdAndSortType({ page: this.page, userId: +this.userId, sortType: null })
+      } else if(panelId === 3) {
+        this.getUsersByPageAndSortType({ page: this.page, where: { email: { contains: this.searchQuery } }, sortType: null })
       }
     },
-    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById']),
-    ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview'])
+    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers']),
+    ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview', 'toggleSearchActive', 'setSearchQuery'])
   },
   computed: {
     calculatedPrice() {
-      return this.orderItems.map(items => items.result.reduce((acc, item) => acc + item.price, 0));
+      return this.orderItems.map(items => items.result.reduce((acc, item) => acc + item.price * item.quantity, 0));
     },
-    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages', 'totalReviewsPages', 'reviews']),
+    totalPages() {
+      if(this.tab === 1) {
+        return this.ordersPages
+      } else if (this.tab === 2) {
+        return this.totalReviewsPages
+      } else if (this.tab === 3) {
+        return this.totalUsersPages
+      }
+    },
+    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages', 'totalReviewsPages', 'reviews', 'users', 'totalUsersPages', 'isSearchActive', 'searchQuery']),
   },
   props: {
     display: String,
@@ -339,6 +392,67 @@ input:invalid {
 .phone-review {
   width: 45vh;
   margin-bottom: 10px;
+}
+
+.wrap{
+  position: absolute;
+  top: 1.25em;
+  right: 15em;
+  width: 0px;
+  height: 55px;
+  line-height: 55px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  transition: all 0.5s ease;
+}
+
+.input{
+  border: 0;
+  background: transparent;
+  width: 0%;
+  outline: none;
+  font-family: sans-serif;
+  font-size: 18px;
+  color: black;
+  font-style: italic;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.wrap .fa{
+  color: #fff;
+  position: absolute;
+  right: 10px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.wrap.active{
+  width: 250px;
+  padding-left: 25px;
+  transition: all 0.5s ease;
+}
+
+.wrap.activeAndroid{
+  width: 150px;
+  padding-left: 25px;
+  transition: all 0.5s ease;
+}
+
+.input.active{
+  width: 98%;
+  padding-left: 5px;
+  transition: all 0.5s 0.8s ease;
+}
+
+.input.activeAndroid{
+  width: 98%;
+  padding-left: 5px;
+  transition: all 0.5s 0.8s ease;
+}
+
+.input::placeholder {
+  color: #fff;
 }
 
 </style>

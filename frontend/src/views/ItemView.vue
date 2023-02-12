@@ -117,9 +117,9 @@ export default {
   methods: {
     selectSortType() {
       this.page = 1;
-      this.getReviewItemsBySortType({ id: +this.$route.params.id, sortType: this.sortType })
+      this.getReviewsItemsBySortType({ productId: +this.$route.params.id, sortType: this.sortType })
     },
-    ...mapActions(['getProduct', 'getReviews', 'getReviewItemsByPage', 'addReview', 'getReviewItemsBySortType']),
+    ...mapActions(['getProduct', 'getReviews', 'getReviewItemsByPage', 'addReview', 'getReviewsItemsBySortType']),
     ...mapMutations(['toggleIsCartModal', 'addProduct', 'toggleIsReview']),
   },
   computed: {
@@ -179,7 +179,7 @@ export default {
 }
 
 .sort-field {
-  width: 25vh
+  width: 30vh
 }
 
 .cart {

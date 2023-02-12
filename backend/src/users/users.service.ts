@@ -20,7 +20,18 @@ export class UsersService {
   }) {
     const { skip, take, where, orderBy, currentPage } = params;
 
+    console.log(where);
+
     const result = await this.prisma.users.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        country: true,
+        city: true,
+        address: true,
+        banned: true,
+      },
       skip,
       take,
       where,

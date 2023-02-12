@@ -18,7 +18,6 @@
                   v-model="rating"
                   :length="5"
                   :size="55"
-                  :rules="ratingRules"
                   required
               ></v-rating>
             </v-col>
@@ -35,6 +34,7 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Notiflix from "notiflix";
 
 export default {
   name: 'ReviewModal.vue',
@@ -46,12 +46,13 @@ export default {
         v => !!v || "Text is required",
         v => v.length <= 200 || "Text must be less than 200 characters"
       ],
-      ratingRules: [
-        v => !!v || "Rating is required"
-      ]
   }),
   methods: {
     async submit() {
+      if(this.rating === null) {
+        Notiflix.Notify.info('Rating must be more than zero')
+        return;
+      }
       if (this.edit) {
         await this.editReview({
           ...this.review,

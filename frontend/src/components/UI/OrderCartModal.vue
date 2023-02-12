@@ -22,6 +22,11 @@
               <div class="d-flex justify-end align-end flex-row h-100" :class="display === 'xs' ? 'w-100' : 'w-50'">
                 <v-card-actions :class="{'w-75 d-flex justify-end': display !== 'xs'}">
                   <v-btn color="error" variant="outlined" @click="removeProduct(index)">Delete Item</v-btn>
+                  <div class="d-flex ml-8 justify-center align-center">
+                    <v-btn @click="product.quantity === 1 ? product.quantity = 1 : product.quantity--"  color="info" variant="outlined">-</v-btn>
+                    <p class="ma-2">{{product.quantity}}</p>
+                    <v-btn @click="product.quantity++" class="ma-0 pa-0" color="success" variant="outlined">+</v-btn>
+                  </div>
                 </v-card-actions>
                 <v-card-text class="text-h6 w-25">{{product.product.price}} €</v-card-text>
               </div>
@@ -44,7 +49,7 @@
             <p class="text-h4" :class="{'pr-4': display !== 'xs' }">{{ calculatedPrice }} €</p>
             <v-btn
                 class="bg-green-lighten-1"
-                @click="createOrder(user.id, productCart,{ total: productCart.length, date: new Date() } )"
+                @click="createOrder(user.id, productCart,{ total: productCart.length, date: new Date()})"
             >
               Make Order
             </v-btn>
@@ -61,9 +66,7 @@ import Notiflix from "notiflix";
 
 export default {
   name: "OrderCartModal.vue",
-  data: () => ({
-
-  }),
+  data: () => ({}),
   methods: {
     createOrder(userId, products, order) {
       if(products.length === 0) {
@@ -79,7 +82,7 @@ export default {
     calculatedPrice() {
       let price = 0;
       for(let i = 0; i < this.productCart.length; i++) {
-        price += this.productCart[i].product.price
+        price += this.productCart[i].product.price * this.productCart[i].quantity
       }
       return price;
     },

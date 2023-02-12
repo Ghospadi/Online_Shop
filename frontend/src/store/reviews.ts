@@ -108,7 +108,7 @@ export const useReviews = {
             }
         },
         // @ts-ignore
-        async getReviewItemsBySortType(context?: { commit: Commit }, { productId, sortType }) {
+        async getReviewsItemsBySortType(context?: { commit: Commit }, { productId, sortType }) {
             try {
                 const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/reviews/all`, { where: { product_id: productId }, page: 1, orderBy: { ...sortType } });
                 context?.commit("GET_REVIEWS", data);

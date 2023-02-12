@@ -19,6 +19,8 @@ export class OrderItemsService {
   }) {
     const { skip, take, where, orderBy, currentPage } = params;
 
+    console.log(where);
+
     const result = await this.prisma.order_items.findMany({
       skip,
       take,
