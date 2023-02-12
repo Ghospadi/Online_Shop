@@ -10,7 +10,7 @@ import { PRODUCT_NOT_FOUND, USER_NOT_FOUND } from 'consts';
 export class ReviewsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(review: CreateReviewsDto) {
+  async createReview(review: CreateReviewsDto) {
     const user = await this.prisma.users.findFirst({
       where: { id: review.user_id },
     });
@@ -27,7 +27,6 @@ export class ReviewsService {
       throw new NotFoundException(PRODUCT_NOT_FOUND);
     }
 
-    // try {
     return this.prisma.reviews.create({
       data: {
         rating: review.rating,
@@ -45,13 +44,6 @@ export class ReviewsService {
         },
       },
     });
-    // } catch (error) {
-    //   if (error.message.includes('A review for this product by this user already exists.')) {
-    //     return  new Error('A review for this product by this user already exists.');
-    //   } else {
-    //     return new Error('An unexpected error has occurred.');
-    //   }
-    // }
   }
 
   async findReviews(params: {
@@ -68,15 +60,27 @@ export class ReviewsService {
       take,
       where,
       orderBy,
+      include: {
+        users: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
-    const totalResults = await this.prisma.reviews.count();
+    const totalResults = await this.prisma.reviews.aggregate({
+      where,
+      _count: true,
+    });
+
+    const { _count } = totalResults;
 
     return {
       currentPage,
       result,
-      totalPages: Math.ceil(totalResults / 10),
-      totalResults,
+      totalPages: Math.ceil(_count / 4),
+      totalResults: _count,
     };
   }
 

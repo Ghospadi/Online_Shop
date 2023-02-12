@@ -2,15 +2,14 @@ import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReviewsDto {
   @IsNumber()
-  @IsOptional()
   rating?: number;
 
   @IsString()
   review: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  timestamp?: Date;
+  timestamp?: string;
 
   @IsNumber()
   user_id: number;

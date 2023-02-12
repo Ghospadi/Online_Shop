@@ -31,7 +31,7 @@ export default {
       class="overflow-hidden"
       style="position: relative;"
   >
-    <v-layout>
+    <v-layout full-height>
       <MyHeader :display="display.name" />
       <router-view :display="display.name"></router-view>
     </v-layout>

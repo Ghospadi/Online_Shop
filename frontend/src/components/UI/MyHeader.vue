@@ -28,7 +28,7 @@
       v-if="this.display === 'xs'"
   >
     <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name)" v-for="(category, index) in categories" :key="category.id">
+      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
         <v-icon
             start
             :icon="getIcon(icons, index)"
@@ -38,19 +38,27 @@
     </div>
   </v-navigation-drawer>
   <v-navigation-drawer
-      v-model="isFilter"
       :model-value="isFilter"
-      @update:modelValue="toggleIsFilter(!isFilter)"
+      @update:modelValue="toggleIsFilter(false)"
       location="right"
       width="300"
   >
     <div class="d-flex flex-column pa-1 justify-start">
       <label class="label" for="standard-select">Sort by:</label>
-      <div class="select">
-        <select id="standard-select" @change="filterHandler($event.target.value)" v-model="sortType">
-          <option v-for="option in sortOptions" :disabled="option.disabled" :value="option.value">{{option.text}}</option>
-        </select>
-      </div>
+      <v-col
+          cols="12"
+          sm="12"
+      >
+        <v-select
+            :items="sortOptions"
+            v-model="sortType"
+            item-value="value"
+            item-title="text"
+            item-disabled="disabled"
+            label="Order By"
+            @update:modelValue="filterHandler(sortType)"
+        ></v-select>
+      </v-col>
     </div>
   </v-navigation-drawer>
 </template>
@@ -133,14 +141,13 @@ export default {
     getIcon(icons, index) {
       return `mdi-${this.icons[index]}`
     },
-    selectCategory(categoryId, categoryName) {
-      this.query = '';
+    selectCategory(categoryId, categoryName, price) {
+      if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
       this.clearSearchQuery();
-      this.setPage(1);
       this.setCategoryId(categoryId);
-      this.toggleSearchActive(false)
-      this.getProductsByCategory(categoryId, 1);
-      this.$router.push('/')
+      this.toggleSearchActive(false);
+      this.setPage(1);
+      this.getProductsByCategory({ categoryId, price, page: 1 });
       this.changeTitle(categoryName);
       this.drawer = false;
     },
@@ -186,20 +193,6 @@ select {
   --select-border: #777;
   --select-focus: blue;
   --select-arrow: var(--select-border);
-}
-
-.select {
-  width: 100%;
-  min-width: 15ch;
-  max-width: 30ch;
-  border: 1px solid var(--select-border);
-  border-radius: 0.25em;
-  padding: 0.25em 0.5em;
-  font-size: 1.25rem;
-  cursor: pointer;
-  line-height: 1.1;
-  background-color: #fff;
-  background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
 }
 
 .label {

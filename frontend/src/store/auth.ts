@@ -1,5 +1,5 @@
-import axios, {Axios, AxiosError} from "axios";
-import { Commit } from "vuex";
+import axios, {AxiosError} from "axios";
+import {Commit} from "vuex";
 import Cookies from 'js-cookie';
 import Notiflix from 'notiflix';
 
@@ -51,8 +51,10 @@ export const useAuth = {
             state.isRegisterModal = flag;
         },
         setToken(state: any) {
-            const token = Cookies.get('jwtToken');
-            state.authToken = token;
+            state.authToken = Cookies.get('jwtToken');
+        },
+        clearUserData(state: any) {
+            state.user = {};
         }
     },
     getters: {

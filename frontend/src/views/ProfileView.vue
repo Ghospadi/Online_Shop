@@ -6,7 +6,7 @@
             <img class="rounded-circle" width="150" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" alt="avatar"/>
             <span class="font-weight-bold">{{ user.name }}</span><span class="text-black-50">{{ user.email }}</span><span></span>
           </div>
-          <form class="pa-3 py-5" @submit.prevent="changeData({ name: `${this.name ? this.name : fullName[0]} ${this.surname ? this.surname : fullName[1]}`, email, age, country, city, address })">
+          <form class="pa-3 py-5" @submit.stop.prevent="changeData({ name: `${this.name ? this.name : fullName[0]} ${this.surname ? this.surname : fullName[1]}`, email, age, country, city, address })">
             <div class="d-flex justify-center align-center mb-3">
               <h4 class="text-right">Profile Settings</h4>
             </div>
@@ -25,7 +25,7 @@
             <v-row class="v-row">
               <v-col class="v-col-md-12"><label class="labels">Address</label><input type="text" class="form-control" minlength="1" maxlength="254" :placeholder="this.user.address" v-model="address"></v-col>
             </v-row>
-            <div class="mt-5 d-flex align-center justify-center text-center"><input type="submit" value="Change Profile" class="floating-button"/><button class="floating-button" @click="logout()">Logout</button></div>
+            <div class="mt-5 d-flex align-center justify-center text-center"><input type="submit" value="Change Profile" class="floating-button"/><button class="floating-button" @click.stop.prevent="logout()">Logout</button></div>
           </form>
       </v-col>
       <v-col class="d-flex flex-wrap flex-column v-col-sm-8">
@@ -96,6 +96,7 @@ export default {
       Cookies.remove('jwtToken');
       Cookies.remove('user');
       this.clearOrders()
+      this.clearUserData()
       this.$router.push('/').catch((error) => console.log(error));
     },
     async changeData(data) {
@@ -113,7 +114,7 @@ export default {
       await this.me();
     },
     ...mapActions(['me', 'updateProfile', 'getOrderItems']),
-    ...mapMutations(['clearOrders'])
+    ...mapMutations(['clearOrders', 'clearUserData'])
   },
   computed: {
     calculatedPrice() {
@@ -171,8 +172,6 @@ input:invalid {
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }
-
-
 
 .orderItem:before {
   content: attr(data-quantity);
