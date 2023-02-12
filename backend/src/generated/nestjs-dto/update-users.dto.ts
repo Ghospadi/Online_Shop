@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class UpdateUsersDto {
   name?: string;
@@ -10,6 +10,4 @@ export class UpdateUsersDto {
   address?: string;
   @IsNumber()
   role_id?: number;
-  @IsOptional()
-  banned?: number;
 }

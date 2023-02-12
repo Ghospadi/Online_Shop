@@ -14,7 +14,6 @@ country: string ;
 city: string ;
 address: string ;
 role_id: number  | null;
-banned: number ;
 orders?: Orders[] ;
 reviews?: Reviews[] ;
 tokens?: Tokens[] ;

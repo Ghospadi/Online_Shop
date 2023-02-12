@@ -80,7 +80,7 @@ export class ReviewsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.USER, Role.ADMIN)
+  @RolesDecorator(Role.USER)
   @Patch(':id')
   async update(
     @Param('id') id: ConnectReviewsDto,

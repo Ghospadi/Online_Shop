@@ -63,13 +63,6 @@ export class ReviewsService {
       include: {
         users: {
           select: {
-            id: true,
-            name: true,
-          },
-        },
-        products: {
-          select: {
-            id: true,
             name: true,
           },
         },
