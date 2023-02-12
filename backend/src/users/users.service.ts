@@ -11,6 +11,37 @@ import { UpdateUsersDto } from '../generated/nestjs-dto/update-users.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findUsers(params: {
+    skip?: number;
+    take?: number;
+    currentPage?: number;
+    where?: Prisma.usersWhereInput;
+    orderBy?: Prisma.usersOrderByWithRelationInput;
+  }) {
+    const { skip, take, where, orderBy, currentPage } = params;
+
+    const result = await this.prisma.users.findMany({
+      skip,
+      take,
+      where,
+      orderBy,
+    });
+
+    const totalResults = await this.prisma.users.aggregate({
+      where,
+      _count: true,
+    });
+
+    const { _count } = totalResults;
+
+    return {
+      currentPage,
+      result,
+      totalPages: Math.ceil(_count / 4),
+      totalResults: _count,
+    };
+  }
+
   async findOne(id: Prisma.usersWhereUniqueInput): Promise<Users> {
     const user = await this.prisma.users.findFirst({
       where: id,

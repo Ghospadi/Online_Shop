@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { Users } from '../generated/nestjs-dto/users.entity';
@@ -15,10 +16,28 @@ import { RolesDecorator } from '../auth/decorator/roles.decorator';
 import { USER_NOT_FOUND } from '../../consts';
 import { ConnectUsersDto } from '../generated/nestjs-dto/connect-users.dto';
 import { UpdateUsersDto } from '../generated/nestjs-dto/update-users.dto';
+import { GetAllByWhereUsers } from './get-users.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RolesDecorator(Role.ADMIN)
+  @Post('all')
+  async findAll(@Body() dto: GetAllByWhereUsers) {
+    console.log(dto);
+    if (!dto.page) {
+      dto.page = 1;
+    }
+    return this.usersService.findUsers({
+      where: dto.where,
+      orderBy: dto.orderBy,
+      currentPage: dto.page,
+      skip: dto.page === 1 ? 0 : dto.page * 4 - 4,
+      take: 4,
+    });
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.ADMIN, Role.USER)
