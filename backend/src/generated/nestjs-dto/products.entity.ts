@@ -6,13 +6,14 @@ import {Reviews} from './reviews.entity'
 
 export class Products {
   id: number ;
-name: string ;
-description: string ;
+name: string  | null;
+description: string  | null;
 price: number  | null;
+rating: number  | null;
 image: string  | null;
 stock: number  | null;
-category_id: number ;
+category_id: number  | null;
 order_items?: OrderItems[] ;
-categories?: Categories ;
+categories?: Categories  | null;
 reviews?: Reviews[] ;
 }
