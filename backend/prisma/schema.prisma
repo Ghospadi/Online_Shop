@@ -5,15 +5,15 @@ generator client {
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
   output                          = "../src/generated/nestjs-dto"
-  outputToNestJsResourceStructure = "false"
-  exportRelationModifierClasses   = "true"
-  fileNamingStyle                 = "camel"
-  createDtoPrefix                 = "Create"
-  entitySuffix                    = ""
-  updateDtoPrefix                 = "Update"
-  entityPrefix                    = ""
   dtoSuffix                       = "Dto"
   reExport                        = "false"
+  exportRelationModifierClasses   = "true"
+  outputToNestJsResourceStructure = "false"
+  createDtoPrefix                 = "Create"
+  entityPrefix                    = ""
+  fileNamingStyle                 = "camel"
+  updateDtoPrefix                 = "Update"
+  entitySuffix                    = ""
 }
 
 datasource db {
@@ -84,6 +84,7 @@ model users {
   city     String    @db.VarChar(255)
   address  String    @db.VarChar(255)
   role_id  Int?
+  banned   Int       @default(0) @db.TinyInt
   orders   orders[]
   reviews  reviews[]
   tokens   tokens[]

@@ -33,7 +33,7 @@
         <h2 class="review-article" :class="{'mr-8 ml-8': display === 'xs', 'mr-16 ml-16': display !== 'xs'}">Reviews:</h2>
         <v-btn
             color="#92B4EC"
-            class="mt-2 mb-2"
+            class="mb-2"
             :class="{'mr-8 ml-8': display === 'xs', 'mr-16 ml-16': display !== 'xs'}"
             @click="toggleIsReview(true)"
         >
@@ -51,7 +51,7 @@
             class="sort-field"
             @update:modelValue="selectSortType()"
         ></v-select>
-        <v-row v-for="review in reviews" class="border mt-6" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+        <v-row v-for="review in reviews" :key="review.id" class="border rounded-lg mt-6" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
           <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
             <h4>{{ review.users.name }}</h4>
             <p>{{ review.timestamp.split('T')[0] }}</p>
@@ -72,7 +72,7 @@
           </v-col>
         </v-row>
         <v-col class="mt-2" cols="12">
-          <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ id: +$route.params.id, page, sortType })"></v-pagination>
+          <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ productId: +$route.params.id, page, sortType })"></v-pagination>
         </v-col>
       </v-col>
       <v-col v-else cols="12" class="d-flex flex-column justify-center align-center">
@@ -117,7 +117,7 @@ export default {
   methods: {
     selectSortType() {
       this.page = 1;
-      this.getReviewItemsBySortType({ id: +this.$route.params.id, sortType: this.sortType })
+      this.getReviewItemsBySortType({ productId: +this.$route.params.id, sortType: this.sortType })
     },
     ...mapActions(['getProduct', 'getReviews', 'getReviewItemsByPage', 'addReview', 'getReviewItemsBySortType']),
     ...mapMutations(['toggleIsCartModal', 'addProduct', 'toggleIsReview']),

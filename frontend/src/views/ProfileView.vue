@@ -29,52 +29,113 @@
           </form>
       </v-col>
       <v-col class="d-flex flex-wrap flex-column v-col-sm-8">
-        <div class="d-flex justify-center mb-5">
-          <h2>Orders</h2>
-        </div>
-        <v-row class="d-flex flex-row flex-wrap justify-center">
-          <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
-            <div>
-              <v-card-text class="pa-0 text-h5"> Order № {{order.id + 1}}</v-card-text>
-            </div>
-            <div class="d-flex orderItem border w-100 ma-2" :data-quantity="item.quantity" v-for="item in order.result" :key="item.id">
-              <div class="d-flex w-100">
-                  <div class="d-flex">
-                    <img :width="display === 'xs' ? 75 : 85" :height="display === 'xs' ? 75 : 85" :src="item.products.image" :alt="item.products.name"/>
-                  </div>
-                  <div class="d-flex align-center text text-wrap pl-3">
-                    {{ item.products.name }}
-                  </div>
+        <v-tabs
+            fixed-tabs
+            background-color="indigo"
+            dark
+            v-model="tab"
+            @update:modelValue="getUserOrdersAndReviews(tab, true)"
+        >
+          <v-tab :value="1">
+            Orders
+          </v-tab>
+          <v-tab :value="2">
+            Reviews
+          </v-tab>
+        </v-tabs>
+        <v-window v-model="tab">
+          <v-window-item
+              v-for="n in 2"
+              :key="n"
+              :value="n"
+          >
+            <v-container fluid>
+              <div class="d-flex justify-center mb-5">
+                <h2>{{ n === 1 ? 'Orders' : 'Reviews' }}</h2>
               </div>
-              <div class="d-flex justify-center text-no-wrap align-center w-25">
-                <v-card-text class="d-flex pa-1">{{ item.products.price }} €</v-card-text>
+              <v-row v-if="n === 1 && orderItems.length !== 0" class="d-flex flex-row flex-wrap justify-center">
+                <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
+                  <div>
+                    <v-card-text class="pa-0 text-h5"> Order № {{order.id + 1}}</v-card-text>
+                  </div>
+                  <div class="d-flex orderItem border w-100 ma-2" :data-quantity="item.quantity" v-for="item in order.result" :key="item.id">
+                    <div class="d-flex w-100">
+                      <div class="d-flex">
+                        <img :width="display === 'xs' ? 75 : 85" :height="display === 'xs' ? 75 : 85" :src="item.products.image" :alt="item.products.name"/>
+                      </div>
+                      <div class="d-flex align-center text text-wrap pl-3">
+                        {{ item.products.name }}
+                      </div>
+                    </div>
+                    <div class="d-flex justify-center text-no-wrap align-center w-25">
+                      <v-card-text class="d-flex pa-1">{{ item.products.price }} €</v-card-text>
+                    </div>
+                  </div>
+                  <div class="d-flex w-100 h-100 justify-end align-end" style="width: 50vh">
+                    <v-card-text class="d-flex justify-end align-end text-h6 pa-0 pr-3">Total: {{calculatedPrice[index]}} €</v-card-text>
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row class="d-flex flex-column justify-center align-center" v-else-if="n === 2 && reviews.length !== 0">
+                <v-col v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+                  <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
+                    <h4 class="text-center">{{ review.users.name }}</h4>
+                    <h5 class="text-center" style="width: 55vh">{{ review.products.name }} </h5>
+                    <p class="text-center">{{ review.timestamp.split('T')[0] }}</p>
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col cols="12" class="pa-1">
+                    <h5 style="word-wrap: break-word;" class="pt-4">{{ review.review }}</h5>
+                    <v-rating
+                        readonly
+                        class="d-flex justify-center align-center"
+                        empty-icon="mdi-star-outline"
+                        full-icon="mdi-star"
+                        half-icon="mdi-star-half-full"
+                        length="5"
+                        size="48"
+                        v-model="review.rating"
+                    ></v-rating>
+                  </v-col>
+                  <v-col class="d-flex justify-end pa-1">
+                    <v-btn @click.stop="editReview(review.id)" color="warning">
+                      Edit Review
+                    </v-btn>
+                  </v-col>
+                </v-col>
+              </v-row>
+              <v-col v-else cols="12" class="d-flex flex-column justify-center align-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/6134/6134116.png" width="150" height="150" alt="NotFoundPicture"/>
+                <p class="mt-4 text-h4">No data...</p>
+              </v-col>
+              <div class="mt-2">
+                <v-pagination :total-visible="5" v-model="page" :length="n === 1 ? ordersPages : totalReviewsPages" @update:modelValue="getUserOrdersAndReviews(n, false)"></v-pagination>
               </div>
-            </div>
-            <div class="d-flex w-100 h-100 justify-end align-end" style="width: 50vh">
-              <v-card-text class="d-flex justify-end align-end text-h6 pa-0 pr-3">Total: {{calculatedPrice[index]}} €</v-card-text>
-            </div>
-          </v-col>
-        </v-row>
-        <div class="mt-2">
-          <v-pagination :total-visible="5" v-model="page" :length="ordersPages" @update:modelValue="this.getOrderItems({ userId: +userId, page })"></v-pagination>
-        </div>
+            </v-container>
+          </v-window-item>
+        </v-window>
       </v-col>
     </v-row>
+    <review-modal :edit="true" />
   </div>
 </template>
 
 <script>
 import Cookies from "js-cookie";
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import {toRaw} from "vue";
 import Notiflix from "notiflix";
+import ReviewModal from "../components/UI/ReviewModal.vue"
 
 export default {
   name: "ProfileView.vue",
+  components: {ReviewModal},
   data: () => ({
     userId: 0,
+    reviewId: 0,
+    productId: null,
     page: 1,
     valid: false,
+    tab: null,
     name: '',
     surname: '',
     email: '',
@@ -113,14 +174,28 @@ export default {
       await this.updateProfile(result);
       await this.me();
     },
-    ...mapActions(['me', 'updateProfile', 'getOrderItems']),
-    ...mapMutations(['clearOrders', 'clearUserData'])
+    editReview(reviewId) {
+      this.getReviewById(reviewId)
+      this.toggleIsReview(true)
+    },
+    getUserOrdersAndReviews(panelId, flag) {
+      if(flag) {
+        this.page = 1;
+      }
+      if(panelId === 1) {
+        this.getOrderItems({ userId: +this.userId, page: this.page })
+      } else {
+        this.getReviewsByPageAndUserIdAndSortType({ page: this.page, userId: +this.userId, sortType: null })
+      }
+    },
+    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById']),
+    ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview'])
   },
   computed: {
     calculatedPrice() {
       return this.orderItems.map(items => items.result.reduce((acc, item) => acc + item.price, 0));
     },
-    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages']),
+    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages', 'totalReviewsPages', 'reviews']),
   },
   props: {
     display: String,
@@ -255,4 +330,15 @@ input:invalid {
 .floating-button:active {
   transform: translateY(0px);
 }
+
+.review {
+  width: 85vh;
+  margin-bottom: 10px;
+}
+
+.phone-review {
+  width: 45vh;
+  margin-bottom: 10px;
+}
+
 </style>
