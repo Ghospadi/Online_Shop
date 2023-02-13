@@ -42,20 +42,26 @@ export const useOrders = {
             const data = Cookies.get(`ProductCard`);
             let parsedData = [];
             if (typeof data === "string") {
-                data ?  parsedData = JSON.parse(data) : parsedData = [];
+                data ? parsedData = JSON.parse(data) : parsedData = [];
             }
             state.productCart = parsedData;
         },
-        addProduct(state: any, product: { id: number, name: string, price: number, image: string }) {
+        addProduct(state: any, product: { id: number, name: string, price: number, image: string, stock: number }) {
             let contains = false;
-            for(let i = 0; i < state.productCart.length; i++) {
+
+            if(product.stock === 0) {
+                Notiflix.Notify.failure(`" ${product.name} " - This product out of stock`);
+                return;
+            }
+
+            for (let i = 0; i < state.productCart.length; i++) {
                 if (state.productCart[i].product.id === product.id) {
                     contains = true;
                 }
             }
-            if(!contains) {
-                state.productCart.push({ product, quantity: 1 })
-                Cookies.set(`ProductCard`, JSON.stringify(state.productCart), { expires: 1 });
+            if (!contains) {
+                state.productCart.push({product, quantity: 1})
+                Cookies.set(`ProductCard`, JSON.stringify(state.productCart), {expires: 1});
                 Notiflix.Notify.success('You successfully add new item');
             } else {
                 Notiflix.Notify.failure(`" ${product.name} " - You already add this item`)
@@ -63,7 +69,7 @@ export const useOrders = {
         },
         removeProduct(state: any, CartItemIndexId: number) {
             const filtered = state.productCart.filter((el: ProductCart, index: number) => index !== CartItemIndexId)
-            Cookies.set(`ProductCard`, JSON.stringify(filtered), { expires: 1 });
+            Cookies.set(`ProductCard`, JSON.stringify(filtered), {expires: 1});
             state.productCart = filtered;
             Notiflix.Notify.success('You remove item');
         },
@@ -72,7 +78,7 @@ export const useOrders = {
         },
         clearBucket(state: any) {
             state.productCart = [];
-            Cookies.set(`ProductCard`, '', { expires: 1 });
+            Cookies.set(`ProductCard`, '', {expires: 1});
         },
         clearOrders(state: any) {
             state.orders = [];
@@ -86,32 +92,44 @@ export const useOrders = {
     },
     actions: {
         // @ts-ignore
-        async makeOrder(context?: { commit: Commit, state: any }, { userId, products, order }: any) {
+        async makeOrder(context?: { commit: Commit, state: any }, {userId, products, order}: any) {
             const token = Cookies.get('jwtToken')
             try {
-                const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/create`, { total: order.total, order_date: order.date, user_id: userId }, { headers: { "Authorization" : `bearer ${token}` }});
-                for(let i = 0; i < products.length; i++) {
-                    await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/create`, {quantity: products[i].quantity, price: products[i].product.price, product_id: products[i].product.id, order_id: data.id}, { headers: { "Authorization" : `bearer ${token}` }})
-                }
+                const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/orders/create`, {
+                    total: order.total,
+                    order_date: order.date,
+                    user_id: userId
+                }, {headers: {"Authorization": `bearer ${token}`}});
+                const array = products.map(((el: any) => ({
+                    quantity: el.quantity,
+                    price: el.product.price,
+                    product_id: el.product.id,
+                    order_id: data.id
+                })));
+                await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/order-items/create`, array, {headers: {"Authorization": `bearer ${token}`}})
                 context?.commit('clearBucket')
                 context?.commit('toggleIsCartModal', false)
                 Notiflix.Notify.success('You create a new order')
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    Notiflix.Notify.failure(e.message)
+                    console.log(e);
+                    Notiflix.Notify.failure(e.response.data.error)
                 }
             }
         },
         // @ts-ignore
-        async getOrderItems(context?: { commit: Commit, state: any }, payload: { userId: number, page: number}) {
+        async getOrderItems(context?: { commit: Commit, state: any }, payload: { userId: number, page: number }) {
             const orderItems: any[] = []
             try {
-                const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/orders/all`, { page: payload.page, where: {user_id: payload.userId} });
-                for(let i = 0; i < data.result.length; i++) {
-                     const result = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/order-items/all`, { where: {order_id: data.result[i].id}});
-                     orderItems.push({ result: result.data.result, id: data.result[i].id });
+                const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/orders/all`, {
+                    page: payload.page,
+                    where: {user_id: payload.userId}
+                });
+                for (let i = 0; i < data.result.length; i++) {
+                    const result = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/order-items/all`, {where: {order_id: data.result[i].id}});
+                    orderItems.push({result: result.data.result, id: data.result[i].id});
                 }
-                context?.commit('ADD_ORDERS', { orderItems, order: data });
+                context?.commit('ADD_ORDERS', {orderItems, order: data});
             } catch (e) {
                 if (axios.isAxiosError(e)) {
                     Notiflix.Notify.failure(e.message)

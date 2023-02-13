@@ -86,7 +86,7 @@ export class ReviewsService {
     return {
       currentPage,
       result,
-      totalPages: Math.ceil(_count / 4),
+      totalPages: Math.ceil(_count / 3),
       totalResults: _count,
     };
   }

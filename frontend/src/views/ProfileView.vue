@@ -1,5 +1,5 @@
 <template>
-  <div class="v-container-fluid w-100 mt-16 d-flex flex-row">
+  <div class="v-container-fluid w-100 mt-16">
     <v-row>
       <v-col class="border-e v-col-sm-4">
           <div class="d-flex flex-column align-center text-center pa-3 py-5">
@@ -28,8 +28,9 @@
             <div class="mt-5 d-flex align-center justify-center text-center"><input type="submit" value="Change Profile" class="floating-button"/><button class="floating-button" @click.stop.prevent="logout()">Logout</button></div>
           </form>
       </v-col>
-      <v-col class="d-flex flex-wrap flex-column v-col-sm-8">
+      <v-col class="d-flex flex-column justify-start v-col-sm-8">
         <v-tabs
+            align-tabs="center"
             fixed-tabs
             background-color="indigo"
             dark
@@ -52,7 +53,6 @@
               :key="n"
               :value="n"
           >
-            <v-container fluid>
               <div class="d-flex justify-center mb-10 mt-4">
                 <h2>{{ n === 1 ? 'Orders' : null }} {{ n === 2 ? 'Reviews' : null }} {{ n === 3 ? 'Users' : null  }}</h2>
                 <div v-show="n === 3" :class="inputLengthCount()" class="wrap">
@@ -60,7 +60,7 @@
                   <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
                 </div>
               </div>
-              <v-row v-if="n === 1 && orderItems.length !== 0" class="d-flex flex-row flex-wrap justify-center">
+              <v-row v-if="n === 1 && orderItems.length !== 0" :style="display !== 'xs' ? 'height: 73vh': null" class="d-flex flex-row flex-wrap justify-center">
                 <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
                   <div>
                     <v-card-text class="pa-0 text-h5"> Order № {{order.id + 1}}</v-card-text>
@@ -83,15 +83,15 @@
                   </div>
                 </v-col>
               </v-row>
-              <v-row class="d-flex flex-column justify-center align-center" v-else-if="n === 2 && reviews.length !== 0">
-                <v-col v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 2 && reviews.length !== 0">
+                <v-col v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2 pa-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ review.users.name }}</h4>
                     <h5 class="text-center" style="width: 55vh">{{ review.products.name }} </h5>
                     <p class="text-center">{{ review.timestamp.split('T')[0] }}</p>
                   </v-col>
                   <v-divider></v-divider>
-                  <v-col cols="12" class="pa-1">
+                  <v-col cols="12" class="pa-0">
                     <h5 style="word-wrap: break-word;" class="pt-4">{{ review.review }}</h5>
                     <v-rating
                         readonly
@@ -104,25 +104,25 @@
                         v-model="review.rating"
                     ></v-rating>
                   </v-col>
-                  <v-col class="d-flex justify-end pa-1">
+                  <v-col class="d-flex justify-end pa-0">
                     <v-btn @click.stop="editReview(review.id)" color="warning">
                       Edit Review
                     </v-btn>
                   </v-col>
                 </v-col>
               </v-row>
-              <v-row class="d-flex flex-column justify-center align-center" v-else-if="n === 3 && users.length !== 0">
-                <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 3 && users.length !== 0">
+                <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'users': display !== 'xs', 'phone-users': display === 'xs'}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ user.id }}</h4>
-                    <h5 class="text-center" style="width: 55vh">{{ user.name }} ({{user.email}}) </h5>
+                    <h5 class="text-center">{{ user.name }} ({{user.email}}) </h5>
                     <p class="text-center">{{ user.country }}</p>
                   </v-col>
                   <v-divider></v-divider>
-                  <v-col cols="12" class="pa-1">
+                  <v-col cols="12" class="pa-0">
                     <h5 style="word-wrap: break-word;" class="pt-4">{{ user.city }} {{ user.address }}</h5>
                   </v-col>
-                  <v-col class="d-flex justify-end pa-1">
+                  <v-col class="d-flex justify-end pa-0">
                     <v-btn @click.stop="editReview(user.id)" color="warning">
                       ManageUser
                     </v-btn>
@@ -136,7 +136,6 @@
               <div class="mt-2">
                 <v-pagination :total-visible="5" v-model="page" :length="totalPages" @update:modelValue="getUserOrdersAndReviewsAndUsers(n, false)"></v-pagination>
               </div>
-            </v-container>
           </v-window-item>
         </v-window>
       </v-col>
@@ -201,7 +200,7 @@ export default {
       await this.me();
     },
     inputLengthCount() {
-      if(this.display === 'xs') return { activeAndroid: this.isSearchActive }
+      if(this.display === 'xs') return { activeAndroid: this.isSearchActive, wrapAndroid: true }
       return { active: this.isSearchActive }
     },
     toggleClass() {
@@ -264,7 +263,7 @@ input:invalid {
 
 .orderCard {
   width: 44vh;
-  height: 27vh;
+  height: 24vh;
   margin-top: 20px;
   overflow: auto;
   border-radius: 5px;
@@ -390,7 +389,17 @@ input:invalid {
 }
 
 .phone-review {
-  width: 45vh;
+  width: 44vh;
+  margin-bottom: 10px;
+}
+
+.users {
+  width: 85vh;
+  margin-bottom: 10px;
+}
+
+.phone-users {
+  width: 44vh;
   margin-bottom: 10px;
 }
 
@@ -398,7 +407,19 @@ input:invalid {
   position: absolute;
   top: 1.25em;
   right: 15em;
-  width: 0px;
+  width: 0;
+  height: 55px;
+  line-height: 55px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  transition: all 0.5s ease;
+}
+
+.wrap.wrapAndroid {
+  position: absolute;
+  top: 1.25em;
+  right: 1em;
+  width: 0;
   height: 55px;
   line-height: 55px;
   border-radius: 5px;

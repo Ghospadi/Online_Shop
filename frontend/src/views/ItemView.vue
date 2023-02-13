@@ -24,8 +24,14 @@
             </v-btn>
           </v-col>
         </v-row>
-        <h2 class="product-description-header mt-6 mb-2">Description</h2>
-        <p class="product-description-text">{{product.description}}</p>
+        <v-row class="d-flex flex-column">
+          <h2 class="product-description-header mt-6 mb-2">Stock</h2>
+          <p class="text-center text-h4">{{product.stock}}</p>
+        </v-row>
+        <v-row class="d-flex flex-column">
+          <h2 class="product-description-header mt-2 mb-2">Description</h2>
+          <p class="product-description-text">{{product.description}}</p>
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="mt-10">
@@ -58,7 +64,7 @@
           </v-col>
           <v-divider></v-divider>
           <v-col cols="12">
-            <h5 class="text-center mt-6">{{ review.review }}</h5>
+            <h5 style="word-wrap: break-word;">{{ review.review }}</h5>
             <v-rating
                 readonly
                 class="d-flex justify-center align-center"
@@ -72,7 +78,7 @@
           </v-col>
         </v-row>
         <v-col class="mt-2" cols="12">
-          <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ id: +$route.params.id, page, sortType })"></v-pagination>
+          <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ productId: +$route.params.id, page, sortType })"></v-pagination>
         </v-col>
       </v-col>
       <v-col v-else cols="12" class="d-flex flex-column justify-center align-center">
@@ -141,7 +147,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 90%;
 }
 
 .product-name {

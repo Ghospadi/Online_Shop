@@ -45,7 +45,6 @@ export class ReviewsController {
           'A review for this product by this user already exists.',
         )
       ) {
-        console.log(1);
         throw new NotFoundException({
           status: HttpStatus.BAD_REQUEST,
           error: REVIEW_ALREADY_EXISTS,
@@ -65,8 +64,8 @@ export class ReviewsController {
       where: dto.where,
       orderBy: dto.orderBy,
       currentPage: dto.page,
-      skip: dto.page === 1 ? 0 : dto.page * 4 - 4,
-      take: 4,
+      skip: dto.page === 1 ? 0 : dto.page * 3 - 3,
+      take: 3,
     });
   }
 

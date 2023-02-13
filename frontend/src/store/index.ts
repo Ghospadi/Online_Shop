@@ -13,11 +13,13 @@ export default createStore({
     isSearchActive: false,
     isFilter: false,
     isReview: false,
+    isUser: false
   },
   getters: {
     isSearchActive: (state) => state.isSearchActive,
     isReview: (state) => state.isReview,
     isFilter: (state) => state.isFilter,
+    isUser: (state) => state.isUser,
     mainTitle: (state) => state.mainTitle,
   },
   mutations: {
@@ -32,6 +34,9 @@ export default createStore({
     },
     toggleIsReview(state: any, flag: boolean) {
       state.isReview = flag;
+    },
+    toggleIsUser(state: any, flag: boolean) {
+      state.isUser = flag;
     },
   },
   modules: {

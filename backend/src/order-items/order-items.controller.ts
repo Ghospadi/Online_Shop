@@ -51,8 +51,8 @@ export class OrderItemsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.USER, Role.ADMIN)
   @Post('create')
-  async create(@Body() dto: CreateOrderItemsDto) {
-    return this.orderItemsService.createOrderItem(dto);
+  async create(@Body() dto: CreateOrderItemsDto[]) {
+    return this.orderItemsService.createOrderItems(dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

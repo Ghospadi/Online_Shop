@@ -44,7 +44,7 @@ export const useUsers = {
         async getUsers(context?: { commit: Commit }, { orderBy = undefined, page = 1 }): Users {
             const token = Cookies.get('jwtToken')
             try {
-                const { data } = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/users/all`, { orderBy, page }, { headers: {'Authorization': `Bearer ${token}`}});
+                const { data } = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/users/all`, { orderBy, page }, { headers: {'Authorization': `Bearer ${token}`} });
                 context?.commit("GET_USERS", data);
             } catch (e) {
                 if (axios.isAxiosError(e)) {
