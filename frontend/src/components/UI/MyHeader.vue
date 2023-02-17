@@ -118,15 +118,14 @@ export default {
       if(this.$route.path === '/profile') {
         this.changeTitle('Popular products')
         this.getProducts(1);
-        this.setCategoryId(0)
+        this.setCategoryId(0);
+        return
       }
-      if(this.$route.path === '/') {
-        this.changeTitle('Popular products')
-        this.setPage(1);
-        this.getProducts(1);
-        this.toggleSearchActive(false)
-        this.setCategoryId(0)
-      }
+      this.changeTitle('Popular products')
+      this.setPage(1);
+      this.getProducts(1);
+      this.toggleSearchActive(false)
+      this.setCategoryId(0)
     },
     filterHandler(sortType) {
       this.setPriceSortType(sortType);

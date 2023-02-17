@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
-    <v-row :class="{ 'product-container': display !== 'xs' }" class="mt-16">
-      <v-col cols="12" md="6">
+  <v-container :class="{ 'pa-16': display !== 'xs' }" fluid>
+    <v-row :class="{ 'product-container': (display !== 'xs' && +$route.query.descriptionLength < 1702) }" class="mt-16">
+      <v-col :class="{'d-flex justify-center': display === 'xs'}" cols="12" md="6">
         <img class="product-image" :src="product.image" alt="product image">
       </v-col>
       <v-col cols="12" md="6">
@@ -76,6 +76,9 @@
                 v-model="review.rating"
             ></v-rating>
           </v-col>
+          <button class="hasDeleteMark" @click="deleteUserReview(review.id, +$route.params.id)" :class="{'mobileMark': display === 'xs'}" v-if="review.users.id === user.id">
+                X
+          </button>
         </v-row>
         <v-col class="mt-2" cols="12">
           <v-pagination :total-visible="5" v-model="page" :length="totalReviewsPages" @update:modelValue="this.getReviewItemsByPage({ productId: +$route.params.id, page, sortType })"></v-pagination>
@@ -125,11 +128,16 @@ export default {
       this.page = 1;
       this.getReviewsItemsBySortType({ productId: +this.$route.params.id, sortType: this.sortType })
     },
-    ...mapActions(['getProduct', 'getReviews', 'getReviewItemsByPage', 'addReview', 'getReviewsItemsBySortType']),
+    async deleteUserReview(reviewId, productId) {
+      await this.deleteReview(reviewId)
+      await this.getReviews(productId)
+      this.page = 1;
+    },
+    ...mapActions(['getProduct', 'getReviews', 'getReviewItemsByPage', 'addReview', 'getReviewsItemsBySortType', 'deleteReview']),
     ...mapMutations(['toggleIsCartModal', 'addProduct', 'toggleIsReview']),
   },
   computed: {
-    ...mapGetters(['product', 'productCart', 'reviews', 'totalReviewsPages'])
+    ...mapGetters(['product', 'productCart', 'reviews', 'totalReviewsPages', 'user'])
   },
   props: {
     display: String,
@@ -177,6 +185,44 @@ export default {
 .review {
   width: 65vh;
   margin-bottom: 10px;
+}
+
+.hasDeleteMark {
+  font-size:12px;
+  font-weight:600;
+  position: relative;
+  left: 98%;
+  bottom: 90%;
+  background: #92B4EC;
+  line-height:24px;
+  padding:0 5px;
+  height:24px;
+  min-width:24px;
+  color: white;
+  text-align:center;
+  border-radius:24px;
+  transition: background-color 0.5s ease;
+}
+
+.hasDeleteMark:hover {
+  background: black;
+  color: white;
+}
+
+.hasDeleteMark.mobileMark {
+  font-size:12px;
+  font-weight:600;
+  position: relative;
+  left: 96%;
+  bottom: 90%;
+  background: #92B4EC;
+  line-height:24px;
+  padding:0 5px;
+  height:24px;
+  min-width:24px;
+  color: white;
+  text-align:center;
+  border-radius:24px;
 }
 
 .phone-review {

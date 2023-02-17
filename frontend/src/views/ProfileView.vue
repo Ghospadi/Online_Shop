@@ -84,7 +84,7 @@
                 </v-col>
               </v-row>
               <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 2 && reviews.length !== 0">
-                <v-col v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2 pa-2" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+                <v-card v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2 pa-0" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ review.users.name }}</h4>
                     <h5 class="text-center" style="width: 55vh">{{ review.products.name }} </h5>
@@ -92,7 +92,7 @@
                   </v-col>
                   <v-divider></v-divider>
                   <v-col cols="12" class="pa-0">
-                    <h5 style="word-wrap: break-word;" class="pt-4">{{ review.review }}</h5>
+                    <h5 style="word-wrap: break-word;" class="pt-4 pl-4">{{ review.review }}</h5>
                     <v-rating
                         readonly
                         class="d-flex justify-center align-center"
@@ -104,12 +104,15 @@
                         v-model="review.rating"
                     ></v-rating>
                   </v-col>
-                  <v-col class="d-flex justify-end pa-0">
-                    <v-btn @click.stop="editReview(review.id)" color="warning">
+                  <v-col class="d-flex pa-0 mb-2" :class="{'justify-center': display === 'xs', 'justify-end': display !== 'xs'}">
+                    <v-btn class="mr-2" @click.stop="deleteUserReview(review.id)" color="error">
+                      Delete Review
+                    </v-btn>
+                    <v-btn class="mr-2" @click.stop="editReview(review.id)" color="warning">
                       Edit Review
                     </v-btn>
                   </v-col>
-                </v-col>
+                </v-card>
               </v-row>
               <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 3 && users.length !== 0">
                 <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'users': display !== 'xs', 'phone-users': display === 'xs'}">
@@ -124,7 +127,7 @@
                   </v-col>
                   <v-col class="d-flex justify-end pa-0">
                     <v-btn @click.stop="editReview(user.id)" color="warning">
-                      ManageUser
+                      Manage User
                     </v-btn>
                   </v-col>
                 </v-col>
@@ -231,7 +234,12 @@ export default {
         this.getUsersByPageAndSortType({ page: this.page, where: { email: { contains: this.searchQuery } }, sortType: null })
       }
     },
-    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers']),
+    async deleteUserReview(reviewId) {
+      await this.deleteReview(reviewId)
+      await this.getReviewsByPageAndUserIdAndSortType({ page: 1, userId: +this.userId, sortType: null })
+      this.page = 1;
+    },
+    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers', 'deleteReview']),
     ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview', 'toggleSearchActive', 'setSearchQuery'])
   },
   computed: {

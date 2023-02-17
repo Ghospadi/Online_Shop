@@ -18,7 +18,6 @@
                   v-model="rating"
                   :length="5"
                   :size="55"
-                  required
               ></v-rating>
             </v-col>
           </v-form>
@@ -49,7 +48,7 @@ export default {
   }),
   methods: {
     async submit() {
-      if(this.rating === null) {
+      if(this.rating === null && !this.edit) {
         Notiflix.Notify.info('Rating must be more than zero')
         return;
       }
@@ -83,12 +82,13 @@ export default {
             rating: this.rating,
             timestamp: new Date()
           })
+          await this.getReviews(+this.$route.params.id)
           this.toggleIsReview(false);
         }
       });
     },
     ...mapMutations(['toggleIsReview', 'setAuthModal']),
-    ...mapActions(['addReview', 'editReview', 'getReviewsByPageAndUserIdAndSortType']),
+    ...mapActions(['addReview', 'editReview', 'getReviewsByPageAndUserIdAndSortType', 'getReviews']),
   },
   computed: {
     ...mapGetters(['isReview', 'user', 'review', 'currentReviewsPage'])

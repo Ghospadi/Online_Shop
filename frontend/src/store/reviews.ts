@@ -93,6 +93,7 @@ export const useReviews = {
         },
         // @ts-ignore
         async getReviewsByPageAndUserIdAndSortType(context?: { commit: Commit }, { page, userId, sortType }) {
+            console.log(1);
             try {
                 if(sortType) {
                     const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/reviews/all`, { where: { user_id: userId }, page, orderBy: { ...sortType } });
@@ -137,6 +138,18 @@ export const useReviews = {
             try {
                 await axios.patch(`${import.meta.env.VITE_MYIP}:8080/api/reviews/${reviewData.id}`, { product_id: reviewData.product_id, user_id: reviewData.user_id, review: reviewData.review, rating: reviewData.rating, timestamp: reviewData.timestamp }, { headers: { "Authorization" : `bearer ${token}` }});
                 Notiflix.Notify.success(`You edit review #${reviewData.id}`)
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.response.data.error)
+                }
+            }
+        },
+        // @ts-ignore
+        async deleteReview(context?: { commit: Commit }, reviewId) {
+            const token = Cookies.get('jwtToken')
+            try {
+                await axios.delete(`${import.meta.env.VITE_MYIP}:8080/api/reviews/${reviewId}`, { headers: { "Authorization" : `bearer ${token}` }});
+                Notiflix.Notify.success(`You deleted review: #${reviewId}`)
             } catch (e) {
                 if (axios.isAxiosError(e)) {
                     Notiflix.Notify.failure(e.response.data.error)

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row :class="{'d-flex justify-center align-center':display === 'xs'}">
-      <v-card @click="redirectToItem(product.id)" class="mt-4 mr-4 border-s bg-shades-transparent" :class="product.stock === 0 ? '' : 'card-scale'"  v-for="product in products" :key="product.id" :width="display !== 'xs' ? 310 : 250">
+      <v-card @click="redirectToItem(product.id, product.description)" class="mt-4 mr-4 border-s bg-shades-transparent" :class="product.stock === 0 ? '' : 'card-scale'"  v-for="product in products" :key="product.id" :width="display !== 'xs' ? 310 : 250">
         <v-img height="200" :src="product.image" cover></v-img>
         <v-card-title>{{product.name}}</v-card-title>
         <div class="d-flex flex-column">
@@ -45,8 +45,8 @@ export default {
     }
   },
   methods: {
-    redirectToItem(id) {
-      this.$router.push(`/item/${id}`);
+    redirectToItem(id, productDescription) {
+      this.$router.push({ path: `/item/${id}`, query: { descriptionLength: productDescription.length } });
       this.toggleSearchActive(false);
       this.toggleIsFilter(false);
     },
