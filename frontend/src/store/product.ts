@@ -26,7 +26,7 @@ export const useProduct = {
     actions: {
         async getProduct(context?: { commit: Commit }, id: number) {
             try {
-                const {data} = await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/products/${id}`);
+                const {data} = await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/products/${+id}`);
                 context?.commit("GET_PRODUCT", data);
             } catch (e) {
                 if (axios.isAxiosError(e)) {
@@ -34,5 +34,15 @@ export const useProduct = {
                 }
             }
         },
+        async checkProduct(context?: { commit: Commit }, id: number) {
+            try {
+                await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/products/${+id}`);
+                return true;
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
+            }
+        }
     }
 };

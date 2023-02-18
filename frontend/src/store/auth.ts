@@ -75,9 +75,10 @@ export const useAuth = {
                 context?.commit('SET_AUTH_DATA', token.data.access_token);
                 Notiflix.Notify.success('You successfully logged in')
                 finish = true
-            } catch (error) {
-                const e = error as AxiosError;
-                Notiflix.Notify.failure(`${e.response?.data?.message}`);
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
             }
             return finish;
         },
@@ -102,9 +103,10 @@ export const useAuth = {
                 const { data } = await axios.get(`${ import.meta.env.VITE_MYIP }:8080/api/users/${user.data.id}`, { headers: { "Authorization" : `bearer ${context?.state.authToken}` }})
                 Cookies.set('user', JSON.stringify(data));
                 context?.commit('SET_USER_DATA', data)
-            } catch (error) {
-                const e = error as AxiosError;
-                Notiflix.Notify.failure(`${e.response?.data?.message}`);
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
             }
         },
 
@@ -113,9 +115,10 @@ export const useAuth = {
             try {
                 await axios.patch(`${ import.meta.env.VITE_MYIP }:8080/api/users/${body.id}`, body, { headers: { "Authorization" : `bearer ${context?.state.authToken}` }})
                 Notiflix.Notify.success(`Profile successfully changed`);
-            }catch (error) {
-                const e = error as AxiosError;
-                Notiflix.Notify.failure(`${e.response?.data?.message}`);
+            }catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
             }
         }
     }

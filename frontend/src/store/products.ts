@@ -106,6 +106,7 @@ export const useProducts = {
         totalPages: (state: any) => state.totalPages,
         priceSortType: (state: any) => state.priceSortType,
         searchQuery: (state: any) => state.searchQuery,
+        totalProducts: (state: any) => state.totalProducts,
     },
     actions: {
         async getProducts(context?: { commit: Commit}, page = 1) {
