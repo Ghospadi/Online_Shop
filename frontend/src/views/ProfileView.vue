@@ -61,30 +61,30 @@
                 </div>
               </div>
               <v-row v-if="n === 1 && orderItems.length !== 0" :style="display !== 'xs' ? 'height: 73vh': null" class="d-flex flex-row flex-wrap justify-center">
-                <v-col class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
-                  <div>
+                <v-card class="d-flex v-col-3 align-center flex-column ma-1 mt-0 pa-2 orderCard border" :class="{'v-col-10': display === 'xs'}" v-for="(order, index) in orderItems" :key="order.id">
+                  <v-col>
                     <v-card-text class="pa-0 text-h5"> Order № {{order.id + 1}}</v-card-text>
-                  </div>
-                  <div class="d-flex orderItem border w-100 ma-2" :data-quantity="item.quantity" v-for="item in order.result" :key="item.id">
-                    <div class="d-flex w-100">
-                      <div class="d-flex">
-                        <img :width="display === 'xs' ? 75 : 85" :height="display === 'xs' ? 75 : 85" :src="item.products.image" :alt="item.products.name"/>
+                  </v-col>
+                    <v-col class="d-flex orderItem border w-100 ma-2" :data-quantity="item.quantity" @click.stop="$router.push({ path: `/item/${item.products.id}`, query: { descriptionLength: item.products.description } })" v-for="item in order.result" :key="item.id">
+                      <div class="d-flex w-100">
+                        <div class="d-flex">
+                          <img :width="display === 'xs' ? 75 : 85" :height="display === 'xs' ? 75 : 85" :src="item.products.image" :alt="item.products.name"/>
+                        </div>
+                        <div class="d-flex align-center text text-wrap pl-3">
+                          {{ item.products.name }}
+                        </div>
                       </div>
-                      <div class="d-flex align-center text text-wrap pl-3">
-                        {{ item.products.name }}
+                      <div class="d-flex justify-center text-no-wrap align-center w-25">
+                        <v-card-text class="d-flex pa-1">{{ item.products.price }} €</v-card-text>
                       </div>
-                    </div>
-                    <div class="d-flex justify-center text-no-wrap align-center w-25">
-                      <v-card-text class="d-flex pa-1">{{ item.products.price }} €</v-card-text>
-                    </div>
-                  </div>
-                  <div class="d-flex w-100 h-100 justify-end align-end" style="width: 50vh">
-                    <v-card-text class="d-flex justify-end align-end text-h6 pa-0 pr-3">Total: {{calculatedPrice[index]}} €</v-card-text>
-                  </div>
-                </v-col>
+                    </v-col>
+                    <v-col class="d-flex w-100 h-100 justify-end align-end" style="width: 50vh">
+                      <v-card-text class="d-flex justify-end align-end text-h6 pa-0 pr-3">Total: {{calculatedPrice[index]}} €</v-card-text>
+                    </v-col>
+                </v-card>
               </v-row>
-              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 2 && reviews.length !== 0">
-                <v-card v-for="review in reviews" :key="review.id" class="border rounded-lg mb-2 pa-0" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
+              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 72vh': null" v-else-if="n === 2 && reviews.length !== 0">
+                <v-card v-for="review in reviews" :key="review.id" @click.stop="$router.push({ path: `/item/${review.products.id}`, query: { descriptionLength: review.products.description } })" class="border rounded-lg mb-2 pa-0" :class="{'review': display !== 'xs', 'phone-review': display === 'xs'}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ review.users.name }}</h4>
                     <h5 class="text-center" style="width: 55vh">{{ review.products.name }} </h5>
@@ -114,7 +114,7 @@
                   </v-col>
                 </v-card>
               </v-row>
-              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 76vh': null" v-else-if="n === 3 && users.length !== 0">
+              <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 72vh': null" v-else-if="n === 3 && users.length !== 0">
                 <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'users': display !== 'xs', 'phone-users': display === 'xs'}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ user.id }}</h4>
@@ -236,8 +236,11 @@ export default {
     },
     async deleteUserReview(reviewId) {
       await this.deleteReview(reviewId)
-      await this.getReviewsByPageAndUserIdAndSortType({ page: 1, userId: +this.userId, sortType: null })
-      this.page = 1;
+      await this.getReviewsByPageAndUserIdAndSortType({ page: this.page, userId: +this.userId, sortType: null })
+      if(this.page > this.totalReviewsPages) {
+        this.page = this.page - 1;
+        await this.getReviewsByPageAndUserIdAndSortType({ page: this.page, userId: +this.userId, sortType: null })
+      }
     },
     ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers', 'deleteReview']),
     ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview', 'toggleSearchActive', 'setSearchQuery'])
@@ -306,6 +309,7 @@ input:invalid {
   width: 80vh;
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  transition: all 0.5s;
 }
 
 .orderItem:before {
@@ -313,8 +317,8 @@ input:invalid {
   font-size:12px;
   font-weight:600;
   position: relative;
-  top: -10px;
-  right: 8px;
+  top: -20px;
+  right: 20px;
   background: #92B4EC;
   line-height:24px;
   padding:0 5px;
@@ -324,11 +328,16 @@ input:invalid {
   opacity: 0;
   text-align:center;
   border-radius:24px;
-  transition: opacity 0.5s;
+  transition: all 0.5s;
 }
 
 .orderItem:hover:before {
   opacity: 1;
+}
+
+.orderItem:hover {
+  cursor: pointer;
+  scale: 1.02
 }
 
 .labels {

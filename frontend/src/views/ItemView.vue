@@ -26,7 +26,7 @@
         </v-row>
         <v-row class="d-flex flex-column">
           <h2 class="product-description-header mt-6 mb-2">Stock</h2>
-          <p class="text-center text-h4">{{product.stock}}</p>
+          <p class="text-center text-h4">{{product.stock ? `Available (${product.stock} Items)` : 'Out of stock'}}</p>
         </v-row>
         <v-row class="d-flex flex-column">
           <h2 class="product-description-header mt-2 mb-2">Description</h2>
@@ -76,7 +76,7 @@
                 v-model="review.rating"
             ></v-rating>
           </v-col>
-          <button class="hasDeleteMark" @click="deleteUserReview(review.id, +$route.params.id)" :class="{'mobileMark': display === 'xs'}" v-if="review.users.id === user.id">
+          <button class="hasDeleteMark" @click="deleteUserReview(review.id, +$route.params.id)" :class="{'mobileMark': display === 'xs'}" v-if="review.users.id === user.id || user.role_id === Role.ADMIN">
                 X
           </button>
         </v-row>
@@ -105,6 +105,7 @@ import OrderCartModal from "../components/UI/OrderCartModal.vue";
 import RegisterModal from "../components/UI/RegisterModal.vue";
 import AuthModal from "../components/UI/AuthModal.vue";
 import ReviewModal from "../components/UI/ReviewModal.vue";
+import {Role} from "../consts.ts";
 
 export default {
   name: "ItemView.vue",
@@ -119,6 +120,9 @@ export default {
     ],
   }),
   components: {ReviewModal, OrderCartModal, RegisterModal, AuthModal},
+  created() {
+    this.Role = Role
+  },
   mounted() {
     this.getProduct(+this.$route.params.id);
     this.getReviews(+this.$route.params.id);

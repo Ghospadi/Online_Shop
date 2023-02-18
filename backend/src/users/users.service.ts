@@ -20,8 +20,6 @@ export class UsersService {
   }) {
     const { skip, take, where, orderBy, currentPage } = params;
 
-    console.log(where);
-
     const result = await this.prisma.users.findMany({
       select: {
         id: true,

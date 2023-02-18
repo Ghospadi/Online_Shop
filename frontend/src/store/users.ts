@@ -79,7 +79,6 @@ export const useUsers = {
                     context?.commit("GET_USERS", data);
                 } else {
                     const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/users/all`, { orderBy: { id: 'asc' }, page }, { headers: {'Authorization': `Bearer ${token}`}});
-                    console.log(data);
                     context?.commit("GET_USERS", data);
                 }
             } catch (e) {

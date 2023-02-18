@@ -142,6 +142,9 @@ export default {
     },
     selectCategory(categoryId, categoryName, price) {
       if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
+      if(this.$route.name === 'profile') {
+       this.navigateTo('home')
+      }
       this.clearSearchQuery();
       this.setCategoryId(categoryId);
       this.toggleSearchActive(false);

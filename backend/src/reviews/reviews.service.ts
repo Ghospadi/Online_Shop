@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Reviews } from 'src/generated/nestjs-dto/reviews.entity';
-import { Prisma } from '@prisma/client';
 import { CreateReviewsDto } from 'src/generated/nestjs-dto/create-reviews.dto';
 import { UpdateReviewsDto } from 'src/generated/nestjs-dto/update-reviews.dto';
 import { PRODUCT_NOT_FOUND, USER_NOT_FOUND } from 'consts';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ReviewsService {
@@ -71,6 +71,7 @@ export class ReviewsService {
           select: {
             id: true,
             name: true,
+            description: true,
           },
         },
       },

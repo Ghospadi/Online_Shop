@@ -98,7 +98,7 @@ export class ReviewsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator(Role.USER)
+  @RolesDecorator(Role.USER, Role.ADMIN)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const asyncResult = await this.reviewService.findOne({ id: Number(id) });

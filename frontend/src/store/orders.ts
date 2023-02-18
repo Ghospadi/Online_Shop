@@ -112,7 +112,6 @@ export const useOrders = {
                 Notiflix.Notify.success('You create a new order')
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    console.log(e);
                     Notiflix.Notify.failure(e.response.data.error)
                 }
             }

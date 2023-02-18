@@ -76,7 +76,6 @@ export const useReviews = {
         },
         // @ts-ignore
         async getReviewItemsByPage(context?: { commit: Commit }, { productId, page, sortType }) {
-            console.log(productId);
             try {
                 if(sortType) {
                     const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/reviews/all`, { where: { product_id: productId }, page, orderBy: { ...sortType } });
@@ -93,14 +92,12 @@ export const useReviews = {
         },
         // @ts-ignore
         async getReviewsByPageAndUserIdAndSortType(context?: { commit: Commit }, { page, userId, sortType }) {
-            console.log(1);
             try {
                 if(sortType) {
                     const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/reviews/all`, { where: { user_id: userId }, page, orderBy: { ...sortType } });
                     context?.commit("GET_REVIEWS", data);
                 } else {
                     const {data} = await axios.post(`${import.meta.env.VITE_MYIP}:8080/api/reviews/all`, { where: { user_id: userId }, orderBy: { timestamp: 'desc' }, page });
-                    console.log(data);
                     context?.commit("GET_REVIEWS", data);
                 }
             } catch (e) {
