@@ -14,7 +14,7 @@
           <v-col
               cols="12"
               sm="6"
-              md="4"
+              md="6"
           >
             <v-text-field
                 label="Legal first name*"
@@ -26,17 +26,7 @@
           <v-col
               cols="12"
               sm="6"
-              md="4"
-          >
-            <v-text-field
-                label="Legal middle name"
-                v-model="middleName"
-            ></v-text-field>
-          </v-col>
-          <v-col
-              cols="12"
-              sm="6"
-              md="4"
+              md="6"
           >
             <v-text-field
                 label="Legal last name*"

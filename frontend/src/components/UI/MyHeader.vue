@@ -142,7 +142,7 @@ export default {
     },
     selectCategory(categoryId, categoryName, price) {
       if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
-      if(this.$route.name === 'profile') {
+      if(this.$route.name === 'profile' || this.$route.name === 'ItemView') {
        this.navigateTo('home')
       }
       this.clearSearchQuery();

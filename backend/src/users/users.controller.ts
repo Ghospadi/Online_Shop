@@ -63,4 +63,36 @@ export class UsersController {
       dto,
     });
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RolesDecorator(Role.ADMIN)
+  @Get('ban/:id')
+  async banUser(@Param('id') id: ConnectUsersDto): Promise<Users> {
+    const asyncResult = await this.usersService.findOne({ id: Number(id) });
+
+    if (!asyncResult) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+
+    return this.usersService.banOrUnbanUser({
+      where: { id: Number(id) },
+      flag: 1,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RolesDecorator(Role.ADMIN)
+  @Get('unban/:id')
+  async unbanUser(@Param('id') id: ConnectUsersDto): Promise<Users> {
+    const asyncResult = await this.usersService.findOne({ id: Number(id) });
+
+    if (!asyncResult) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+
+    return this.usersService.banOrUnbanUser({
+      where: { id: Number(id) },
+      flag: 0,
+    });
+  }
 }

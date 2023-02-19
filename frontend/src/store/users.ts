@@ -23,6 +23,7 @@ interface Users {
 export const useUsers = {
     state: {
         users: [] as User[],
+        selectedUser: {},
         currentPage: 1 as number,
         totalUsersPages: 0 as number,
         totalUsersResults: 0 as number,
@@ -33,11 +34,16 @@ export const useUsers = {
             state.currentPage = data.currentPage;
             state.totalUsersPages = data.totalPages;
             state.totalUsersResults = data.totalResults;
-        }
+        },
+        GET_SELECTED_USER(state: any, data: User) {
+            state.selectedUser = data;
+        },
     },
     getters: {
         users: (state: any) => state.users,
         totalUsersPages: (state: any) => state.totalUsersPages,
+        selectedUser: (state: any) => state.selectedUser,
+        selectedUserFullName: (state: any) => state.selectedUser.name ? state.selectedUser.name.split(' ') : []
     },
     actions: {
         // @ts-ignore
@@ -87,5 +93,17 @@ export const useUsers = {
                 }
             }
         },
+        // @ts-ignore
+        async getUserById(context?: { commit: Commit }, userId: number) {
+            const token = Cookies.get('jwtToken')
+            try{
+                const {data} = await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/users/${userId}`, { headers: {'Authorization': `Bearer ${token}`}});
+                context?.commit("GET_SELECTED_USER", data);
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
+            }
+        }
     }
 };

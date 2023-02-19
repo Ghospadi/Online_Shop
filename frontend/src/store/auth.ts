@@ -120,6 +120,32 @@ export const useAuth = {
                     Notiflix.Notify.failure(e.message)
                 }
             }
+        },
+
+        // @ts-ignore
+        async banUser(context?: { state: any }, userId: number) {
+            const token = Cookies.get('jwtToken')
+            try {
+                await axios.get(`${ import.meta.env.VITE_MYIP }:8080/api/users/ban/${userId}`, { headers: {'Authorization': `Bearer ${token}`}})
+                Notiflix.Notify.success(`User successfully banned`);
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
+            }
+        },
+
+        // @ts-ignore
+        async unBanUser(context?: { state: any }, userId: number) {
+            const token = Cookies.get('jwtToken')
+            try {
+                await axios.get(`${ import.meta.env.VITE_MYIP }:8080/api/users/unban/${userId}`, { headers: {'Authorization': `Bearer ${token}`}})
+                Notiflix.Notify.success(`User successfully unbanned`);
+            } catch (e) {
+                if (axios.isAxiosError(e)) {
+                    Notiflix.Notify.failure(e.message)
+                }
+            }
         }
     }
 };

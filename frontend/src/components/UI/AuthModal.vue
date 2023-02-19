@@ -78,13 +78,16 @@ export default {
         if(!result) return;
         this.setToken();
         await this.me();
+        if(this.user.banned) {
+          this.$router.push({ name: 'BannedView' }).catch((error) => console.log(error));
+        }
         this.setAuthModal(false);
     },
     ...mapActions(["userLogin", 'me']),
     ...mapMutations(['setAuthModal', 'setToken', "setRegisterModal"])
   },
   computed: {
-    ...mapGetters(["isAuthModal"]),
+    ...mapGetters(["isAuthModal", "user"]),
   }
 }
 </script>

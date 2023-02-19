@@ -115,7 +115,7 @@
                 </v-card>
               </v-row>
               <v-row class="d-flex flex-column justify-center align-center" :style="display !== 'xs' ? 'height: 72vh': null" v-else-if="n === 3 && users.length !== 0">
-                <v-col v-for="user in users" :key="user.id" class="border rounded-lg mb-2" :class="{'users': display !== 'xs', 'phone-users': display === 'xs'}">
+                <v-col v-for="user in users" :key="user.id" class="rounded-lg mb-2" :class="{'users': display !== 'xs', 'phone-users': display === 'xs', 'blocked': user.banned, 'border': !user.banned}">
                   <v-col cols="12" class="d-flex justify-space-between align-center pa-4">
                     <h4 class="text-center">{{ user.id }}</h4>
                     <h5 class="text-center">{{ user.name }} ({{user.email}}) </h5>
@@ -126,7 +126,7 @@
                     <h5 style="word-wrap: break-word;" class="pt-4">{{ user.city }} {{ user.address }}</h5>
                   </v-col>
                   <v-col class="d-flex justify-end pa-0">
-                    <v-btn @click.stop="editReview(user.id)" color="warning">
+                    <v-btn @click.stop="selectUser(user.id)" color="warning">
                       Manage User
                     </v-btn>
                   </v-col>
@@ -144,6 +144,7 @@
       </v-col>
     </v-row>
     <review-modal :edit="true" />
+    <user-modal :current-users-page="page" />
   </div>
 </template>
 
@@ -152,10 +153,11 @@ import Cookies from "js-cookie";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Notiflix from "notiflix";
 import ReviewModal from "../components/UI/ReviewModal.vue"
+import UserModal from "../components/UI/UserModal.vue"
 
 export default {
   name: "ProfileView.vue",
-  components: {ReviewModal},
+  components: {UserModal, ReviewModal},
   data: () => ({
     userId: 0,
     reviewId: 0,
@@ -220,6 +222,10 @@ export default {
       this.getReviewById(reviewId)
       this.toggleIsReview(true)
     },
+    async selectUser(userId) {
+      await this.getUserById(userId)
+      this.toggleIsUser(true)
+    },
     getUserOrdersAndReviewsAndUsers(panelId, flag) {
       if(flag) {
         this.page = 1;
@@ -242,8 +248,8 @@ export default {
         await this.getReviewsByPageAndUserIdAndSortType({ page: this.page, userId: +this.userId, sortType: null })
       }
     },
-    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers', 'deleteReview']),
-    ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview', 'toggleSearchActive', 'setSearchQuery'])
+    ...mapActions(['me', 'updateProfile', 'getOrderItems', 'getReviewsByPageAndUserIdAndSortType', 'getReviewById', 'getUsers', 'getUsersByPageAndSortType', 'searchUsers', 'deleteReview', 'getUserById']),
+    ...mapMutations(['clearOrders', 'clearUserData', 'toggleIsReview', 'toggleSearchActive', 'setSearchQuery', 'toggleIsUser'])
   },
   computed: {
     calculatedPrice() {
@@ -258,7 +264,7 @@ export default {
         return this.totalUsersPages
       }
     },
-    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages', 'totalReviewsPages', 'reviews', 'users', 'totalUsersPages', 'isSearchActive', 'searchQuery']),
+    ...mapGetters(['user', 'fullName', 'orderItems', 'ordersPages', 'totalReviewsPages', 'reviews', 'users', 'totalUsersPages', 'isSearchActive', 'searchQuery', 'isUser']),
   },
   props: {
     display: String,
@@ -418,6 +424,10 @@ input:invalid {
 .phone-users {
   width: 44vh;
   margin-bottom: 10px;
+}
+
+.blocked {
+  border: 1px solid red;
 }
 
 .wrap{
