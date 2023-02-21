@@ -12,6 +12,7 @@ interface ProductCart {
 interface OrderItems {
         id: number,
         order_id: number,
+        description: string,
         product_id: number,
         quantity: number,
         price: number,
@@ -46,7 +47,7 @@ export const useOrders = {
             }
             state.productCart = parsedData;
         },
-        addProduct(state: any, product: { id: number, name: string, price: number, image: string, stock: number }) {
+        addProduct(state: any, product: { id: number, name: string, description: string, price: number, image: string, stock: number }) {
             let contains = false;
 
             if(product.stock === 0) {

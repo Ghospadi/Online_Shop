@@ -49,7 +49,7 @@ export const useProducts = {
         totalPages: 0 as number,
         currentPage: 1 as number,
         selectedCategoryId: 0 as number,
-        priceSortType: null,
+        priceSortType: '',
         searchQuery: '',
     },
     mutations: {

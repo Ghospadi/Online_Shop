@@ -27,15 +27,7 @@
       v-model="drawer"
       v-if="this.display === 'xs'"
   >
-    <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-      <button class="btn text-black collaps text-decoration-none pt-2 pb-2" @click.prevent="selectCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
-        <v-icon
-            start
-            :icon="getIcon(icons, index)"
-        ></v-icon>
-        {{ category.name }}
-      </button>
-    </div>
+    <category-list :onClick="selectCategory" :categories="categories" :price-sort-type="priceSortType" />
   </v-navigation-drawer>
   <v-navigation-drawer
       :model-value="isFilter"
@@ -66,10 +58,11 @@
 <script>
 
 import {mapActions, mapGetters, mapMutations} from "vuex";
-import Cookies from "js-cookie";
+import CategoryList from '../Lists/CategoryList.vue';
 
 export default {
   name: "MyHeader",
+  components: {CategoryList},
   data: () => ({
     drawer: false,
     isActive: false,
@@ -81,21 +74,6 @@ export default {
     sortOptions: [
       { text: 'From cheap to expensive', value: 'asc', disabled: false },
       { text: 'From expensive to cheap', value: 'desc', disabled: false },
-    ],
-    icons: [
-      'all-inclusive',
-      'monitor',
-      'laptop',
-      'cellphone',
-      'washing-machine',
-      'hammer-wrench',
-      'sofa',
-      'pipe-leak',
-      'tshirt-crew',
-      'pinwheel',
-      'paw',
-      'paperclip',
-      'controller'
     ],
   }),
   methods: {

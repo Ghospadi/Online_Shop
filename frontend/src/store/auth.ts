@@ -71,10 +71,10 @@ export const useAuth = {
             try {
                 finish = false;
                 const token = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/auth/login`, { email, password });
-                Cookies.set('jwtToken', token.data.access_token, { expires: 7 })
+                Cookies.set('jwtToken', token.data.access_token, { expires: 1/48 })
                 context?.commit('SET_AUTH_DATA', token.data.access_token);
-                Notiflix.Notify.success('You successfully logged in')
-                finish = true
+                Notiflix.Notify.success('You successfully logged in');
+                finish = true;
             } catch (e) {
                 if (axios.isAxiosError(e)) {
                     Notiflix.Notify.failure(e.message)

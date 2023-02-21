@@ -1,15 +1,7 @@
 <template>
   <div class="v-container--fluid w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0, 'ml-16': display !== 'xs' }">
     <div v-show="display !== 'xs'" class="border-e w-25">
-      <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-        <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="selectedCategory(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
-          <v-icon
-              start
-              :icon="getIcon(icons, index)"
-          ></v-icon>
-          {{ category.name }}
-        </button>
-      </div>
+      <category-list :categories="categories" :price-sort-type="priceSortType" :onClick="selectedCategory"/>
     </div>
     <div class="v-container--fluid w-100 d-flex flex-column" :class="screenClassObject">
       <div class="cart" :data-totalitems="productCart.length">
@@ -37,7 +29,8 @@ import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 import ProductsList from "../components/Lists/ProductsList.vue";
 import AuthModal from "../components/UI/AuthModal.vue";
 import RegisterModal from "../components/UI/RegisterModal.vue";
-import OrderCartModal from '../components/UI/OrderCartModal.vue'
+import OrderCartModal from '../components/UI/OrderCartModal.vue';
+import CategoryList from '../components/Lists/CategoryList.vue';
 
 export default {
   name: "HomeView",
@@ -58,7 +51,7 @@ export default {
         'controller'
     ],
   }),
-  components: {OrderCartModal, RegisterModal, AuthModal, ProductsList},
+  components: {CategoryList, OrderCartModal, RegisterModal, AuthModal, ProductsList},
   created() {
     if(this.categories.length === 0) {
       this.getProducts();
@@ -69,9 +62,6 @@ export default {
     this.setToken();
   },
   methods: {
-    getIcon(icons, index) {
-      return `mdi-${this.icons[index]}`
-    },
     selectedCategory(categoryId, categoryName, price) {
       if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
       this.clearSearchQuery();
@@ -108,17 +98,6 @@ export default {
 
 <style scoped>
 .moreButton:hover {
-  color: #92B4EC;
-}
-
-.btn {
-  width: 75vh;
-  text-align: left;
-  color: black;
-  cursor: pointer;
-}
-
-.btn:hover {
   color: #92B4EC;
 }
 

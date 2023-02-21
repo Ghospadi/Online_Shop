@@ -7,7 +7,7 @@
         <div class="d-flex flex-column">
           <div class="d-flex">
             <v-card-text class="mb-2" :class="{'text-h4': display !== 'xs', 'text-h5': display === 'xs'}">{{product.price}} €</v-card-text>
-            <v-btn @click.prevent.stop="addProduct({ id: product.id, name: product.name, price: product.price, image: product.image, stock: product.stock })" class="float-right mr-2 mt-2" :border="false" :elevation="0">
+            <v-btn @click.prevent.stop="addProduct({ id: product.id, name: product.name, description: product.description, price: product.price, image: product.image, stock: product.stock })" class="float-right mr-2 mt-2" :border="false" :elevation="0">
               <v-icon size="large" icon="mdi-cart-variant" />
             </v-btn>
           </div>

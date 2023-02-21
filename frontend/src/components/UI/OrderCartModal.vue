@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-      v-model="isCartModal"
+      :model-value="isCartModal"
       scrollable
       @update:modelValue="toggleIsCartModal(false)"
       width="1040"
@@ -10,7 +10,7 @@
       <v-divider></v-divider>
         <v-row class="d-flex justify-center align-center flex-column">
           <v-col class=" pa-5 border-b" v-for="(product, index) in productCart" :key="product.id">
-            <v-card class="d-flex flex-row pa-4" :width="display === 'xs' ? 330 : null" :height="display === 'xs' ? 150 : 136" :class="{'flex-column': display === 'xs'}">
+            <v-card @click.stop="redirectToProduct(product.product)" class="d-flex flex-row pa-4" :width="display === 'xs' ? 330 : null" :height="display === 'xs' ? 150 : 136" :class="{'flex-column': display === 'xs'}">
               <div class="d-flex justify-start align-start flex-row h-100 w-50">
                 <div class="w-auto red">
                   <v-img width="70" :src="product.product.image"/>
@@ -21,11 +21,11 @@
               </div>
               <div class="d-flex flex-row" :class="display === 'xs' ? 'w-100 justify-center align-center' : 'w-50 justify-end align-end'">
                 <v-card-actions :class="{'w-75 d-flex justify-end': display !== 'xs'}">
-                  <v-btn class="mr-2" color="error" variant="outlined" @click="removeProduct(index)">Delete Item</v-btn>
+                  <v-btn class="mr-2" color="error" variant="outlined" @click.stop="removeProduct(index)">Delete Item</v-btn>
                   <div class="d-flex justify-center align-center" :class="display !== 'xs' ? 'ml-6': null">
-                    <v-btn @click="product.quantity === 1 ? product.quantity = 1 : product.quantity--"  color="info" variant="outlined">-</v-btn>
+                    <v-btn @click.stop="product.quantity === 1 ? product.quantity = 1 : product.quantity--"  color="info" variant="outlined">-</v-btn>
                     <p class="ma-2">{{product.quantity}}</p>
-                    <v-btn @click="product.quantity++" class="ma-0 pa-0" color="success" variant="outlined">+</v-btn>
+                    <v-btn @click.stop="product.quantity++" class="ma-0 pa-0" color="success" variant="outlined">+</v-btn>
                   </div>
                 </v-card-actions>
                 <v-card-text :class="display === 'xs' ? 'pa-0' : 'text-h6'" >{{product.product.price}} €</v-card-text>
@@ -40,7 +40,7 @@
                 color="blue-darken-1"
                 variant="outlined"
                 class="d-flex align-center justify-center"
-                @click="toggleIsCartModal(false)"
+                @click.stop="toggleIsCartModal(false)"
             >
               <v-card-text :style="display === 'xs' ? 'font-size: 10px' : null">Continue shopping</v-card-text>
             </v-btn>
@@ -49,7 +49,7 @@
             <p class="text-h4" :class="{'pr-4': display !== 'xs' }">{{ calculatedPrice }} €</p>
             <v-btn
                 class="bg-green-lighten-1"
-                @click="createOrder(user.id, productCart,{ total: productCart.length, date: new Date()})"
+                @click.stop="createOrder(user.id, productCart,{ total: productCart.length, date: new Date()})"
             >
               Make Order
             </v-btn>
@@ -74,6 +74,10 @@ export default {
         return;
       }
       this.makeOrder({ userId, products, order })
+    },
+    redirectToProduct(product){
+      this.$router.push({ path: `/item/${product.id}`, query: { descriptionLength: product.description } })
+      this.toggleIsCartModal(false)
     },
     ...mapMutations(['toggleIsCartModal', 'removeProduct']),
     ...mapActions(['makeOrder']),
