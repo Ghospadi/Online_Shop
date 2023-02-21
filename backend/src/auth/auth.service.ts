@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '../../node_modules/.prisma/client';
+import { Prisma } from '@prisma/client';
 import { addDays } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
