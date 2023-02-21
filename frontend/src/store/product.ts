@@ -24,6 +24,7 @@ export const useProduct = {
         product: (state: any) => state.product
     },
     actions: {
+        // @ts-ignore
         async getProduct(context?: { commit: Commit }, id: number) {
             try {
                 const {data} = await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/products/${+id}`);
@@ -34,6 +35,7 @@ export const useProduct = {
                 }
             }
         },
+        // @ts-ignore
         async checkProduct(context?: { commit: Commit }, id: number) {
             try {
                 await axios.get(`${import.meta.env.VITE_MYIP}:8080/api/products/${+id}`);

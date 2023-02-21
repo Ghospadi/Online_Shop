@@ -26,7 +26,7 @@ interface SortProductsPayload {
 
 interface GetProductsByPagePayload {
     page: number;
-    orderBy?: { price?: string, rating?: string, stock: string };
+    orderBy?: { price?: string, rating?: string, stock?: string };
     where?: { name?: { contains: string }, category_id?: number}
 }
 
@@ -143,7 +143,6 @@ export const useProducts = {
         },
         // @ts-ignore
         async getProductsByPage(context?: { commit: Commit}, { query = '', categoryId = 0, sortType, page = 1 }) {
-            console.log(sortType)
             let payload: GetProductsByPagePayload = { page };
             if (categoryId !== 0) {
                 payload = { ...payload, where: { category_id: categoryId } };

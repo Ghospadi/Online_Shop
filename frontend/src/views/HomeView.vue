@@ -5,7 +5,7 @@
     </div>
     <div class="v-container--fluid w-100 d-flex flex-column" :class="screenClassObject">
       <div class="cart" :data-totalitems="productCart.length">
-        <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="src/assets/shopping-cart.svg" alt="cart"/></button>
+        <button @click="toggleIsCartModal(true)" class="cart-button"><v-icon size="large" icon="mdi-cart-variant" /></button>
       </div>
       <h2 class="title" ref="title">{{ mainTitle === 'All' ? 'All products' : mainTitle }}</h2>
       <div v-if="products.length === 0" class="d-flex justify-center align-center flex-column h-100 w-100">

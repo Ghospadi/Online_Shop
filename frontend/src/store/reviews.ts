@@ -125,6 +125,7 @@ export const useReviews = {
                 Notiflix.Notify.success('You create new review')
             } catch (e) {
                 if (axios.isAxiosError(e)) {
+                    // @ts-ignore
                     Notiflix.Notify.failure(e.response.data.error)
                 }
             }
@@ -137,6 +138,7 @@ export const useReviews = {
                 Notiflix.Notify.success(`You edit review #${reviewData.id}`)
             } catch (e) {
                 if (axios.isAxiosError(e)) {
+                    // @ts-ignore
                     Notiflix.Notify.failure(e.response.data.error)
                 }
             }
@@ -149,6 +151,7 @@ export const useReviews = {
                 Notiflix.Notify.success(`You deleted review: #${reviewId}`)
             } catch (e) {
                 if (axios.isAxiosError(e)) {
+                    // @ts-ignore
                     Notiflix.Notify.failure(e.response.data.error)
                 }
             }

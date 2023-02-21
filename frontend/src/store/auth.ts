@@ -92,6 +92,7 @@ export const useAuth = {
                 finish = true
             } catch (error) {
                 const e = error as AxiosError;
+                // @ts-ignore
                 Notiflix.Notify.failure(`${e.response?.data?.message}`);
             }
             return finish;

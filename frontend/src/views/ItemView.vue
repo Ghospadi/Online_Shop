@@ -90,7 +90,7 @@
       </v-col>
     </v-row>
     <div class="cart" :data-totalitems="productCart.length">
-      <button @click="toggleIsCartModal(true)" class="cart-button"><img width="25" src="../assets/shopping-cart.svg" alt="cart"/></button>
+      <button @click="toggleIsCartModal(true)" class="cart-button"><v-icon size="large" icon="mdi-cart-variant"/></button>
     </div>
     <auth-modal />
     <register-modal />
