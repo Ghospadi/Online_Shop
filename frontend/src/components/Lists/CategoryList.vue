@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column pa-1 text-no-wrap justify-start">
-    <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="onClick(category.id, category.name, priceSortType)" v-for="(category, index) in categories" :key="category.id">
+    <button class="btn text-decoration-none pt-2 pb-2" @click.prevent="onClick(category.id, category.name, sortType)" v-for="(category, index) in categories" :key="category.id">
       <v-icon
           start
           :icon="getIcon(icons, index)"
@@ -44,7 +44,7 @@ export default {
       type: Array,
       required: true
     },
-    priceSortType: {
+    sortType: {
       type: String,
       required: true
     }

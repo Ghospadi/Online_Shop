@@ -20,25 +20,25 @@ interface Products {
 
 interface SortProductsPayload {
     page: number;
-    orderBy: { price: any };
+    orderBy: { price?: string, rating?: string, stock: string };
     where?: { name?: { contains: string }, category_id?: number }
 }
 
 interface GetProductsByPagePayload {
     page: number;
-    orderBy?: { price?: string, rating?: string };
+    orderBy?: { price?: string, rating?: string, stock: string };
     where?: { name?: { contains: string }, category_id?: number}
 }
 
 interface GetProductsByNameAndCategoryAndFilterTypePayload {
     page: number;
-    orderBy?: { price?: string, rating?: string };
+    orderBy?: { price?: string, rating?: string, stock: string };
     where: { name?: { contains: string }, category_id?: number}
 }
 
 interface getProductsByCategoryPayload {
     page: number;
-    orderBy?: { price?: string, rating?: string };
+    orderBy?: { price?: string, rating?: string, stock: string };
     where?: { name?: { contains: string }, category_id?: number}
 }
 
@@ -49,7 +49,7 @@ export const useProducts = {
         totalPages: 0 as number,
         currentPage: 1 as number,
         selectedCategoryId: 0 as number,
-        priceSortType: '',
+        sortType: {},
         searchQuery: '',
     },
     mutations: {
@@ -89,8 +89,8 @@ export const useProducts = {
         addPage(state: any, page: number) {
             state.currentPage += page;
         },
-        setPriceSortType(state: any, type: string) {
-            state.priceSortType = type;
+        setSortType(state: any, type: string) {
+            state.sortType = type;
         },
         setSearchQuery(state: any, query: string) {
             state.searchQuery = query;
@@ -104,7 +104,7 @@ export const useProducts = {
         selectedCategoryId: (state: any) => state.selectedCategoryId,
         currentPage: (state: any) => state.currentPage,
         totalPages: (state: any) => state.totalPages,
-        priceSortType: (state: any) => state.priceSortType,
+        sortType: (state: any) => state.sortType,
         searchQuery: (state: any) => state.searchQuery,
         totalProducts: (state: any) => state.totalProducts,
     },
@@ -120,8 +120,8 @@ export const useProducts = {
             }
         },
         // @ts-ignore
-        async getSortedProducts(context?: { commit: Commit}, { price, categoryId, query }) {
-            let payload: SortProductsPayload = { page: 1, orderBy: { price } }
+        async getSortedProducts(context?: { commit: Commit}, { sortType, categoryId, query }) {
+            let payload: SortProductsPayload = { page: 1, orderBy: sortType }
             if(categoryId) {
                 if(query) {
                     payload.where = { name: { contains: query }, category_id: categoryId }
@@ -142,7 +142,8 @@ export const useProducts = {
             }
         },
         // @ts-ignore
-        async getProductsByPage(context?: { commit: Commit}, { query = '', categoryId = 0, price, page = 1 }) {
+        async getProductsByPage(context?: { commit: Commit}, { query = '', categoryId = 0, sortType, page = 1 }) {
+            console.log(sortType)
             let payload: GetProductsByPagePayload = { page };
             if (categoryId !== 0) {
                 payload = { ...payload, where: { category_id: categoryId } };
@@ -150,8 +151,8 @@ export const useProducts = {
             if (query) {
                 payload = { ...payload, where: { ...payload.where, name: { contains: query } } };
             }
-            if (price) {
-                payload = { ...payload, orderBy: { price } };
+            if (sortType) {
+                payload = { ...payload, orderBy: sortType };
             } else {
                 payload = { ...payload, orderBy: { rating: 'desc' } };
             }
@@ -165,7 +166,7 @@ export const useProducts = {
             }
         },
         // @ts-ignore
-        async getProductsByNameAndCategoryAndFilterType(context = { commit }, { query = '', categoryId = 0, price, page = 1 } = {}) {
+        async getProductsByNameAndCategoryAndFilterType(context = { commit }, { query = '', categoryId = 0, sortType, page = 1 } = {}) {
             try {
                 let params: GetProductsByNameAndCategoryAndFilterTypePayload = {
                     where: { name: { contains: query }},
@@ -174,8 +175,8 @@ export const useProducts = {
                 if(categoryId !== 0) {
                     params.where.category_id = categoryId;
                 }
-                if(price) {
-                    params.orderBy = { price };
+                if(sortType) {
+                    params.orderBy = sortType;
                 }
                 const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/products/all`, params);
                 context.commit("SEARCH_PRODUCTS", data);
@@ -186,18 +187,18 @@ export const useProducts = {
             }
         },
         // @ts-ignore
-        async getProductsByCategory(context?: { commit: Commit}, { categoryId, price, page = 1 }) {
+        async getProductsByCategory(context?: { commit: Commit}, { categoryId, sortType, page = 1 }) {
             try {
                 let queryParams: getProductsByCategoryPayload = { page };
 
-                if (categoryId === 0 && !price) {
+                if (categoryId === 0 && !sortType) {
                     // do nothing
-                } else if (categoryId === 0 && price) {
-                    queryParams = { ...queryParams, orderBy: { price } };
-                } else if (!price) {
+                } else if (categoryId === 0 && sortType) {
+                    queryParams = { ...queryParams, orderBy: sortType };
+                } else if (!sortType) {
                     queryParams = { ...queryParams, where: { category_id: categoryId } };
                 } else {
-                    queryParams = { ...queryParams, where: { category_id: categoryId }, orderBy: { price } };
+                    queryParams = { ...queryParams, where: { category_id: categoryId }, orderBy: sortType };
                 }
                 const { data } = await axios.post(`${ import.meta.env.VITE_MYIP }:8080/api/products/all`, queryParams);
                 context?.commit("GET_PRODUCTS_BY_CATEGORY", data);

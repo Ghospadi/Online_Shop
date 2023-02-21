@@ -30,6 +30,7 @@
       <v-row class="d-flex justify-end ma-2">
         <v-btn @click.stop="banOrUnbanUser(selectedUser.banned, selectedUser.id)" :color="selectedUser.banned ? 'info' : 'error'">{{selectedUser.banned ? 'Unblock User' : 'Block User'}}</v-btn>
       </v-row>
+
     </v-card>
   </v-dialog>
 </template>

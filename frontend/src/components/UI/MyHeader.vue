@@ -1,33 +1,33 @@
 <template>
-    <v-app-bar
-        :color="'#92B4EC'"
-        prominent
-    >
-      <v-app-bar-nav-icon @click.stop="this.drawer = !this.drawer" v-show="display === 'xs'"></v-app-bar-nav-icon>
+  <v-app-bar
+      :color="'#92B4EC'"
+      prominent
+  >
+    <v-app-bar-nav-icon @click.stop="this.drawer = !this.drawer" v-show="display === 'xs'"></v-app-bar-nav-icon>
 
-      <div :class="{ 'nav__routeAndroid': display === 'xs', 'nav__route': display !== 'xs' }" v-for="route in routes" :key="route.path">
-        <router-link class="route__text" :to="route.path" @click="homeRedirect()">{{ route.name }}</router-link>
-      </div>
+    <div :class="{ 'nav__routeAndroid': display === 'xs', 'nav__route': display !== 'xs' }" v-for="route in routes" :key="route.path">
+      <router-link class="route__text" :to="route.path" @click="homeRedirect()">{{ route.name }}</router-link>
+    </div>
 
-      <v-spacer></v-spacer>
+    <v-spacer></v-spacer>
 
-      <div v-show="$route.path === '/'" :class="inputLengthCount()" class="wrap">
-        <input type="text" class="input" v-model.trim="query" @keyup.enter="searchItems(this.query, this.selectedCategoryId, this.priceSortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
-        <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
-      </div>
+    <div v-show="$route.path === '/'" :class="inputLengthCount()" class="wrap">
+      <input type="text" class="input" v-model.trim="query" @keyup.enter="searchItems(this.query, this.selectedCategoryId, this.sortType)" :class="inputLengthCount()" placeholder="Поиск...  ">
+      <button class="fa text-black" @click="toggleClass"><v-icon icon="mdi-magnify"></v-icon></button>
+    </div>
 
-      <div v-show="$route.path === '/'">
-        <v-btn  @click.stop="toggleIsFilter(!this.isFilter)" variant="text" icon="mdi-filter"></v-btn>
-      </div>
+    <div v-show="$route.path === '/'">
+      <v-btn  @click.stop="toggleIsFilter(!this.isFilter)" variant="text" icon="mdi-filter"></v-btn>
+    </div>
 
-      <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" icon="mdi-account"></v-btn>
-      <v-btn v-show="authToken" variant="text" @click.stop="navigateTo('profile')" icon="mdi-account"></v-btn>
-    </v-app-bar>
+    <v-btn v-show="!authToken" variant="text" @click.stop="setAuthModal(true)" icon="mdi-account"></v-btn>
+    <v-btn v-show="authToken" variant="text" @click.stop="navigateTo('profile')" icon="mdi-account"></v-btn>
+  </v-app-bar>
   <v-navigation-drawer
       v-model="drawer"
       v-if="this.display === 'xs'"
   >
-    <category-list :onClick="selectCategory" :categories="categories" :price-sort-type="priceSortType" />
+    <category-list :onClick="selectCategory" :categories="categories" :sort-type="sortType" />
   </v-navigation-drawer>
   <v-navigation-drawer
       :model-value="isFilter"
@@ -72,8 +72,12 @@ export default {
       { path: '/', name: 'Home' },
     ],
     sortOptions: [
-      { text: 'From cheap to expensive', value: 'asc', disabled: false },
-      { text: 'From expensive to cheap', value: 'desc', disabled: false },
+      { text: 'From in stock to out of stock', value: { stock: 'desc' }, disabled: false },
+      { text: 'From out of stock to in stock', value: { stock: 'asc' }, disabled: false },
+      { text: 'From expensive to cheap', value: { price: 'desc' }, disabled: false },
+      { text: 'From cheap to expensive', value: { price: 'asc' }, disabled: false },
+      { text: 'From high rated to low rated', value: { rating: 'desc' }, disabled: false },
+      { text: 'From low rated to high rated', value: { rating: 'asc' }, disabled: false }
     ],
   }),
   methods: {
@@ -81,14 +85,14 @@ export default {
       this.toggleSearchActive(!this.isSearchActive);
     },
     async navigateTo(route) {
-        if(route === 'profile') {
-          this.toggleIsFilter(false);
-        }
-        this.$router.push({ name: route }).catch((error) => console.log(error));
-        this.query = '';
-        this.clearSearchQuery();
-        await this.me();
-        this.setCategoryId(0);
+      if(route === 'profile') {
+        this.toggleIsFilter(false);
+      }
+      this.$router.push({ name: route }).catch((error) => console.log(error));
+      this.query = '';
+      this.clearSearchQuery();
+      await this.me();
+      this.setCategoryId(0);
     },
     homeRedirect() {
       this.query = '';
@@ -106,8 +110,8 @@ export default {
       this.setCategoryId(0)
     },
     filterHandler(sortType) {
-      this.setPriceSortType(sortType);
-      this.getSortedProducts({ price: this.priceSortType, categoryId: this.selectedCategoryId, query: this.searchQuery })
+      this.setSortType(sortType);
+      this.getSortedProducts({ sortType: this.sortType, categoryId: this.selectedCategoryId, query: this.searchQuery })
       this.sortType = '';
       this.toggleIsFilter(false);
     },
@@ -118,31 +122,31 @@ export default {
     getIcon(icons, index) {
       return `mdi-${this.icons[index]}`
     },
-    selectCategory(categoryId, categoryName, price) {
+    selectCategory(categoryId, categoryName, sortType) {
       if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
       if(this.$route.name === 'profile' || this.$route.name === 'ItemView') {
-       this.navigateTo('home')
+        this.navigateTo('home')
       }
       this.clearSearchQuery();
       this.setCategoryId(categoryId);
       this.toggleSearchActive(false);
       this.setPage(1);
-      this.getProductsByCategory({ categoryId, price, page: 1 });
+      this.getProductsByCategory({ categoryId, sortType, page: 1 });
       this.changeTitle(categoryName);
       this.drawer = false;
     },
-    searchItems(searchQuery, selectedCategoryId, priceSortType) {
+    searchItems(searchQuery, selectedCategoryId, sortType) {
       if(!searchQuery) return;
       this.setSearchQuery(searchQuery);
       this.setPage(1);
-      this.getProductsByNameAndCategoryAndFilterType({ query: searchQuery, categoryId: selectedCategoryId, price: priceSortType })
+      this.getProductsByNameAndCategoryAndFilterType({ query: searchQuery, categoryId: selectedCategoryId, sortType })
       this.query = '';
     },
     ...mapActions(['getProductsByNameAndCategoryAndFilterType', 'getProducts', 'getProductsByCategory', 'me', 'getSortedProducts']),
-    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setPriceSortType', 'setSearchQuery', 'clearSearchQuery', 'toggleIsFilter']),
+    ...mapMutations(['setAuthModal', 'clearProducts', 'toggleSearchActive', 'changeTitle', 'setCategoryId', 'setPage', 'setSortType', 'setSearchQuery', 'clearSearchQuery', 'toggleIsFilter']),
   },
   computed: {
-    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'priceSortType', 'searchQuery', 'isFilter']),
+    ...mapGetters(['isAuthModal', 'authToken', 'products', 'isSearchActive', 'categories', 'selectedCategoryId', 'user', 'currentPage', 'searchQuery', 'isFilter']),
   },
   props: {
     display: {

@@ -1,7 +1,7 @@
 <template>
   <div class="v-container--fluid w-100 mt-16 d-flex flex-row" :class="{ 'h-screen': products.length === 0, 'h-100': products.length !== 0, 'ml-16': display !== 'xs' }">
     <div v-show="display !== 'xs'" class="border-e w-25">
-      <category-list :categories="categories" :price-sort-type="priceSortType" :onClick="selectedCategory"/>
+      <category-list :categories="categories" :sort-type="sortType" :onClick="selectedCategory"/>
     </div>
     <div class="v-container--fluid w-100 d-flex flex-column" :class="screenClassObject">
       <div class="cart" :data-totalitems="productCart.length">
@@ -62,13 +62,13 @@ export default {
     this.setToken();
   },
   methods: {
-    selectedCategory(categoryId, categoryName, price) {
+    selectedCategory(categoryId, categoryName, sortType) {
       if(categoryId === this.selectedCategoryId && categoryName === 'all') return;
       this.clearSearchQuery();
       this.setCategoryId(categoryId);
       this.toggleSearchActive(false);
       this.setPage(1);
-      this.getProductsByCategory({ categoryId, price, page: 1 });
+      this.getProductsByCategory({ categoryId, sortType, page: 1 });
       this.changeTitle(categoryName);
     },
     additionalItemsHandler() {
@@ -76,13 +76,13 @@ export default {
         return
       }
       this.addPage(1);
-      this.getProductsByPage({ query: this.searchQuery, categoryId: this.selectedCategoryId, page: this.currentPage, price: this.priceSortType })
+      this.getProductsByPage({ query: this.searchQuery, categoryId: this.selectedCategoryId, page: this.currentPage, sortType: this.sortType })
     },
     ...mapActions(['getProducts', 'getCategories', 'userLogin', 'getProductsByCategory', 'getProductsByPage']),
     ...mapMutations(['setAuthModal', 'toggleSearchActive', 'setToken', 'clearProducts', 'changeTitle', 'setCategoryId', 'toggleIsCartModal', 'setPage', 'addPage', 'clearSearchQuery'])
   },
   computed: {
-    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user', 'currentPage', 'totalPages', 'priceSortType', 'searchQuery']),
+    ...mapGetters(['products', 'categories', 'isAuthModal', 'mainTitle', 'selectedCategoryId', 'productCart', 'user', 'currentPage', 'totalPages', 'sortType', 'searchQuery']),
     screenClassObject() {
       return {
         'justify-center align-center ml-2': this.display === 'xs',
