@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../node_modules/.prisma/client';
 import { addDays } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { HttpException, NotFoundException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 import { TOKEN_NOT_FOUND } from 'consts';
-import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
