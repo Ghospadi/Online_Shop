@@ -13,14 +13,11 @@ To prepare the web site, follow these steps:
 
 - Navigate to the backend folder in the terminal and "run yarn" or "npm install" to install all the required dependencies.
 
+- Create database with output_file that located at DB folder.
+
 - Create a new .env file in the root directory of the backend folder and add the following two fields:
     > DATABASE_URL = "your MySQL connection string".
     > JWT_SECRET = "your JWT secret key".
-  
-- In the backend folder, run the following command to initialize all the tables in MySQL:
-    > "npx prisma db push"
-
-- Add some rows in the product and category tables.
 
 - Start the server by running the command "yarn start" or "npm run start" in the terminal.
 
