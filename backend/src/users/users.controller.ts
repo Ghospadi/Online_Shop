@@ -67,7 +67,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.ADMIN)
   @Get('ban/:id')
-  async banUser(@Param('id') id: ConnectUsersDto): Promise<Users> {
+  async banUser(@Param('id') id: ConnectUsersDto): Promise<boolean> {
     const asyncResult = await this.usersService.findOne({ id: Number(id) });
 
     if (!asyncResult) {
@@ -83,7 +83,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator(Role.ADMIN)
   @Get('unban/:id')
-  async unbanUser(@Param('id') id: ConnectUsersDto): Promise<Users> {
+  async unbanUser(@Param('id') id: ConnectUsersDto): Promise<boolean> {
     const asyncResult = await this.usersService.findOne({ id: Number(id) });
 
     if (!asyncResult) {

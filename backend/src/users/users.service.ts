@@ -104,11 +104,13 @@ export class UsersService {
       throw new NotFoundException(USER_NOT_FOUND);
     }
 
-    return this.prisma.users.update({
+    await this.prisma.users.update({
       data: {
         banned: flag,
       },
       where,
     });
+
+    return true;
   }
 }
