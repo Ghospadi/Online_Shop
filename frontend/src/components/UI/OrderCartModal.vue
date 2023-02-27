@@ -73,13 +73,18 @@ export default {
         Notiflix.Notify.failure("You can't create order without products");
         return;
       }
+      if(!user) {
+        Notiflix.Notify.failure("You don't signed in")
+        this.setAuthModal(true);
+        return;
+      }
       this.makeOrder({ userId, products, order })
     },
     redirectToProduct(product){
       this.$router.push({ path: `/item/${product.id}`, query: { descriptionLength: product.description } })
       this.toggleIsCartModal(false)
     },
-    ...mapMutations(['toggleIsCartModal', 'removeProduct']),
+    ...mapMutations(['toggleIsCartModal', 'removeProduct', 'setAuthModal']),
     ...mapActions(['makeOrder']),
   },
   computed: {
