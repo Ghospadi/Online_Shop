@@ -45,7 +45,7 @@ export default {
       required: true
     },
     sortType: {
-      type: String,
+      type: Object,
       required: true
     }
   },

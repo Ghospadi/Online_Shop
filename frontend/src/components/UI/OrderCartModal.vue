@@ -73,7 +73,7 @@ export default {
         Notiflix.Notify.failure("You can't create order without products");
         return;
       }
-      if(!user) {
+      if(!userId) {
         Notiflix.Notify.failure("You don't signed in")
         this.setAuthModal(true);
         return;
