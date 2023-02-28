@@ -26,6 +26,6 @@ To prepare the web site, follow these steps:
 - Create a new .env file in the root directory of the frontend folder and add the following field:
     > VITE_MYIP = "http:// your IP address"
   
-- Start the application by running the command yarn dev or npm run dev in the terminal.
+- Start the application by running the command "yarn dev" or "npm run dev" in the terminal.
 
 # And that's it! You should now have the web site up and running.
